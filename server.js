@@ -62,4 +62,5 @@ const startServer = async () => {
   }
 };
 
+console.log("Booking API CI/CD Test");
 startServer();
