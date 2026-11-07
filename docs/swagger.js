@@ -719,23 +719,7 @@ const swaggerSpec = {
         responses: {
           201: {
             description: "File uploaded successfully",
-            content: {
-              "application/json": {
-                example: {
-                  success: true,
-                  message: "File uploaded successfully",
-                  data: {
-                    fileName: "report.pdf",
-                    storedFileName:
-                      "550e8400-e29b-41d4-a716-446655440000.pdf",
-                    fileType: "application/pdf",
-                    fileSize: 102400,
-                    fileUrl:
-                      "https://bookingmanagementservices.onrender.com/uploads/550e8400-e29b-41d4-a716-446655440000.pdf",
-                  },
-                },
-              },
-            },
+            
           },
 
           400: {
