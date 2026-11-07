@@ -14,5 +14,30 @@ router.get(
   authorize("admin"),
   adminController.getAllBookings
 );
+router.get(
+  "/bookings/:id",
+  authenticate,
+  authorize("admin"),
+  adminController.getBookingById
+);
+router.put(
+  "/bookings/:id/status",
+  authenticate,
+  authorize("admin"),
+  adminController.updateBookingStatus
+);
+router.put(
+  "/bookings/:id",
+  authenticate,
+  authorize("admin"),
+  adminController.updateBooking
+);
+
+router.delete(
+  "/bookings/:id",
+  authenticate,
+  authorize("admin"),
+  adminController.deleteBooking
+);
 
 module.exports = router;
