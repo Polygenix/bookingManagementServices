@@ -1,3 +1,4 @@
+
 const swaggerSpec = {
   openapi: "3.0.3",
 
@@ -22,6 +23,9 @@ const swaggerSpec = {
     { name: "Authentication" },
     { name: "Customer Booking" },
     { name: "Admin Booking" },
+    { name: "Admin Test Management" },
+    { name: "Customer Test Management" },
+    { name: "Common APIs" },
   ],
 
   components: {
@@ -93,12 +97,15 @@ const swaggerSpec = {
   },
 
   paths: {
+    // =========================================
     // AUTHENTICATION APIs
+    // =========================================
 
     "/api/auth/register": {
       post: {
         tags: ["Authentication"],
         summary: "Register Admin or Customer",
+
         requestBody: {
           required: true,
           content: {
@@ -109,6 +116,7 @@ const swaggerSpec = {
             },
           },
         },
+
         responses: {
           201: { description: "User registered successfully" },
           400: { description: "Validation error" },
@@ -122,6 +130,7 @@ const swaggerSpec = {
       post: {
         tags: ["Authentication"],
         summary: "Login Admin or Customer",
+
         requestBody: {
           required: true,
           content: {
@@ -132,6 +141,7 @@ const swaggerSpec = {
             },
           },
         },
+
         responses: {
           200: { description: "Login successful" },
           401: { description: "Invalid credentials" },
@@ -140,13 +150,16 @@ const swaggerSpec = {
       },
     },
 
+    // =========================================
     // CUSTOMER BOOKING APIs
+    // =========================================
 
     "/api/customer/bookings": {
       post: {
         tags: ["Customer Booking"],
         summary: "Create Booking",
         security: [{ BearerAuth: [] }],
+
         requestBody: {
           required: true,
           content: {
@@ -157,6 +170,7 @@ const swaggerSpec = {
             },
           },
         },
+
         responses: {
           201: { description: "Booking created successfully" },
           401: { description: "Unauthorized" },
@@ -168,6 +182,7 @@ const swaggerSpec = {
         tags: ["Customer Booking"],
         summary: "Get Customer Bookings",
         security: [{ BearerAuth: [] }],
+
         responses: {
           200: { description: "Bookings fetched successfully" },
           401: { description: "Unauthorized" },
@@ -181,6 +196,7 @@ const swaggerSpec = {
         tags: ["Customer Booking"],
         summary: "Get Booking By ID",
         security: [{ BearerAuth: [] }],
+
         parameters: [
           {
             name: "id",
@@ -189,6 +205,7 @@ const swaggerSpec = {
             schema: { type: "string" },
           },
         ],
+
         responses: {
           200: { description: "Booking fetched successfully" },
           404: { description: "Booking not found" },
@@ -200,6 +217,7 @@ const swaggerSpec = {
         tags: ["Customer Booking"],
         summary: "Update Booking",
         security: [{ BearerAuth: [] }],
+
         parameters: [
           {
             name: "id",
@@ -208,6 +226,7 @@ const swaggerSpec = {
             schema: { type: "string" },
           },
         ],
+
         requestBody: {
           required: true,
           content: {
@@ -218,6 +237,7 @@ const swaggerSpec = {
             },
           },
         },
+
         responses: {
           200: { description: "Booking updated successfully" },
           404: { description: "Booking not found" },
@@ -229,6 +249,7 @@ const swaggerSpec = {
         tags: ["Customer Booking"],
         summary: "Delete Booking",
         security: [{ BearerAuth: [] }],
+
         parameters: [
           {
             name: "id",
@@ -237,6 +258,7 @@ const swaggerSpec = {
             schema: { type: "string" },
           },
         ],
+
         responses: {
           200: { description: "Booking deleted successfully" },
           404: { description: "Booking not found" },
@@ -245,7 +267,9 @@ const swaggerSpec = {
       },
     },
 
+    // =========================================
     // ADMIN BOOKING APIs
+    // =========================================
 
     "/api/admin/bookings": {
       get: {
@@ -253,6 +277,7 @@ const swaggerSpec = {
         summary: "Get All Customer Bookings",
         description: "Admin can view all customer bookings",
         security: [{ BearerAuth: [] }],
+
         responses: {
           200: { description: "All bookings fetched successfully" },
           401: { description: "Unauthorized - Token required" },
@@ -282,24 +307,12 @@ const swaggerSpec = {
         ],
 
         responses: {
-          200: {
-            description: "Booking fetched successfully",
-          },
-          400: {
-            description: "Invalid booking ID",
-          },
-          401: {
-            description: "Token required",
-          },
-          403: {
-            description: "Admin access required",
-          },
-          404: {
-            description: "Booking not found",
-          },
-          500: {
-            description: "Internal server error",
-          },
+          200: { description: "Booking fetched successfully" },
+          400: { description: "Invalid booking ID" },
+          401: { description: "Token required" },
+          403: { description: "Admin access required" },
+          404: { description: "Booking not found" },
+          500: { description: "Internal server error" },
         },
       },
 
@@ -311,8 +324,8 @@ const swaggerSpec = {
 
         parameters: [
           {
-            in: "path",
             name: "id",
+            in: "path",
             required: true,
             schema: {
               type: "string",
@@ -373,24 +386,12 @@ const swaggerSpec = {
         },
 
         responses: {
-          200: {
-            description: "Booking updated successfully",
-          },
-          400: {
-            description: "Invalid booking ID or update data",
-          },
-          401: {
-            description: "Unauthorized",
-          },
-          403: {
-            description: "Admin access required",
-          },
-          404: {
-            description: "Booking not found",
-          },
-          500: {
-            description: "Internal server error",
-          },
+          200: { description: "Booking updated successfully" },
+          400: { description: "Invalid booking ID or update data" },
+          401: { description: "Unauthorized" },
+          403: { description: "Admin access required" },
+          404: { description: "Booking not found" },
+          500: { description: "Internal server error" },
         },
       },
 
@@ -414,34 +415,22 @@ const swaggerSpec = {
         ],
 
         responses: {
-          200: {
-            description: "Booking deleted successfully",
-          },
-          400: {
-            description: "Invalid booking ID",
-          },
-          401: {
-            description: "Token required",
-          },
-          403: {
-            description: "Admin access required",
-          },
-          404: {
-            description: "Booking not found",
-          },
-          500: {
-            description: "Internal server error",
-          },
+          200: { description: "Booking deleted successfully" },
+          400: { description: "Invalid booking ID" },
+          401: { description: "Token required" },
+          403: { description: "Admin access required" },
+          404: { description: "Booking not found" },
+          500: { description: "Internal server error" },
         },
       },
     },
-
 
     "/api/admin/bookings/{id}/status": {
       put: {
         tags: ["Admin Booking"],
         summary: "Update Booking Status",
         security: [{ BearerAuth: [] }],
+
         parameters: [
           {
             name: "id",
@@ -450,6 +439,7 @@ const swaggerSpec = {
             schema: { type: "string" },
           },
         ],
+
         requestBody: {
           required: true,
           content: {
@@ -468,6 +458,7 @@ const swaggerSpec = {
             },
           },
         },
+
         responses: {
           200: { description: "Booking status updated successfully" },
           400: { description: "Invalid ID or status" },
@@ -478,7 +469,10 @@ const swaggerSpec = {
         },
       },
     },
+
+    // =========================================
     // ADMIN TEST MANAGEMENT APIs
+    // =========================================
 
     "/api/admin/tests": {
       post: {
@@ -522,21 +516,11 @@ const swaggerSpec = {
         },
 
         responses: {
-          201: {
-            description: "Test created successfully",
-          },
-          400: {
-            description: "Invalid test details",
-          },
-          401: {
-            description: "Token required",
-          },
-          403: {
-            description: "Admin access required",
-          },
-          500: {
-            description: "Internal server error",
-          },
+          201: { description: "Test created successfully" },
+          400: { description: "Invalid test details" },
+          401: { description: "Token required" },
+          403: { description: "Admin access required" },
+          500: { description: "Internal server error" },
         },
       },
 
@@ -547,18 +531,10 @@ const swaggerSpec = {
         security: [{ BearerAuth: [] }],
 
         responses: {
-          200: {
-            description: "Tests fetched successfully",
-          },
-          401: {
-            description: "Token required",
-          },
-          403: {
-            description: "Admin access required",
-          },
-          500: {
-            description: "Internal server error",
-          },
+          200: { description: "Tests fetched successfully" },
+          401: { description: "Token required" },
+          403: { description: "Admin access required" },
+          500: { description: "Internal server error" },
         },
       },
     },
@@ -584,84 +560,197 @@ const swaggerSpec = {
         ],
 
         responses: {
-          200: {
-            description: "Test fetched successfully",
+          200: { description: "Test fetched successfully" },
+          400: { description: "Invalid test ID" },
+          401: { description: "Token required" },
+          403: { description: "Admin access required" },
+          404: { description: "Test not found" },
+          500: { description: "Internal server error" },
+        },
+      },
+
+      put: {
+        tags: ["Admin Test Management"],
+        summary: "Update Test",
+        description: "Admin can update existing test details",
+        security: [{ BearerAuth: [] }],
+
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+              example: "672a12345678901234567890",
+            },
+            description: "Test ID",
           },
+        ],
+
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  testName: {
+                    type: "string",
+                    example: "Complete Blood Count",
+                  },
+                  description: {
+                    type: "string",
+                    example: "Updated blood test description",
+                  },
+                  price: {
+                    type: "number",
+                    example: 600,
+                  },
+                  preparationInstructions: {
+                    type: "string",
+                    example: "Fasting required for 8 hours",
+                  },
+                  duration: {
+                    type: "string",
+                    example: "12 hours",
+                  },
+                  isActive: {
+                    type: "boolean",
+                    example: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+
+        responses: {
+          200: { description: "Test updated successfully" },
+          400: { description: "Invalid test ID or update data" },
+          401: { description: "Token required" },
+          403: { description: "Admin access required" },
+          404: { description: "Test not found" },
+          500: { description: "Internal server error" },
+        },
+      },
+
+      delete: {
+        tags: ["Admin Test Management"],
+        summary: "Delete Test",
+        description: "Admin can delete a medical test",
+        security: [{ BearerAuth: [] }],
+
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+              example: "672a12345678901234567890",
+            },
+            description: "Test ID",
+          },
+        ],
+
+        responses: {
+          200: { description: "Test deleted successfully" },
+          400: { description: "Invalid test ID" },
+          401: { description: "Token required" },
+          403: { description: "Admin access required" },
+          404: { description: "Test not found" },
+          500: { description: "Internal server error" },
+        },
+      },
+    },
+
+    // =========================================
+    // CUSTOMER TEST MANAGEMENT APIs
+    // =========================================
+
+    "/api/customer/tests": {
+      get: {
+        tags: ["Customer Test Management"],
+        summary: "Get All Available Tests",
+        description: "Customer can view all active medical tests",
+        security: [{ BearerAuth: [] }],
+
+        responses: {
+          200: { description: "Available tests fetched successfully" },
+          401: { description: "Token required" },
+          403: { description: "Customer access required" },
+          500: { description: "Internal server error" },
+        },
+      },
+    },
+
+    // =========================================
+    // COMMON FILE UPLOAD API
+    // =========================================
+
+    "/api/common/upload": {
+      post: {
+        tags: ["Common APIs"],
+        summary: "Upload Image or PDF",
+        description:
+          "Common API to upload images and PDF files for Admin and Customer",
+        security: [{ BearerAuth: [] }],
+
+        requestBody: {
+          required: true,
+          content: {
+            "multipart/form-data": {
+              schema: {
+                type: "object",
+                required: ["file"],
+                properties: {
+                  file: {
+                    type: "string",
+                    format: "binary",
+                    description:
+                      "Upload JPG, JPEG, PNG, WEBP or PDF (Maximum 5 MB)",
+                  },
+                },
+              },
+            },
+          },
+        },
+
+        responses: {
+          201: {
+            description: "File uploaded successfully",
+            content: {
+              "application/json": {
+                example: {
+                  success: true,
+                  message: "File uploaded successfully",
+                  data: {
+                    fileName: "report.pdf",
+                    storedFileName:
+                      "550e8400-e29b-41d4-a716-446655440000.pdf",
+                    fileType: "application/pdf",
+                    fileSize: 102400,
+                    fileUrl:
+                      "https://bookingmanagementservices.onrender.com/uploads/550e8400-e29b-41d4-a716-446655440000.pdf",
+                  },
+                },
+              },
+            },
+          },
+
           400: {
-            description: "Invalid test ID",
+            description: "Invalid file or file size exceeded",
           },
           401: {
             description: "Token required",
-          },
-          403: {
-            description: "Admin access required",
-          },
-          404: {
-            description: "Test not found",
           },
           500: {
             description: "Internal server error",
           },
         },
       },
-      put: {
-      tags: ["Admin Test Management"],
-      summary: "Update Test",
-      description: "Admin can update existing test details",
-      security: [{ BearerAuth: [] }],
-
-      parameters: [
-        {
-          name: "id",
-          in: "path",
-          required: true,
-          schema: {
-            type: "string",
-            example: "672a12345678901234567890"
-          }
-        }
-      ],
-
-
-      responses: {
-        200: { description: "Test updated successfully" },
-        400: { description: "Invalid test ID or update data" },
-        401: { description: "Token required" },
-        403: { description: "Admin access required" },
-        404: { description: "Test not found" },
-        500: { description: "Internal server error" }
-      }
-      },
-      delete: {
-      tags: ["Admin Test Management"],
-      summary: "Delete Test",
-      description: "Admin can delete a medical test",
-      security: [{ BearerAuth: [] }],
-
-      parameters: [
-        {
-          name: "id",
-          in: "path",
-          required: true,
-          schema: {
-            type: "string",
-            example: "672a12345678901234567890"
-          },
-          description: "Test ID"
-        }
-      ],
-
-      responses: {
-        200: { description: "Test deleted successfully" },
-        400: { description: "Invalid test ID" },
-        401: { description: "Token required" },
-        403: { description: "Admin access required" },
-        404: { description: "Test not found" },
-        500: { description: "Internal server error" }
-      }
-      }
     },
-
   },
 };
 
