@@ -1,4 +1,5 @@
 
+const mongoose = require("mongoose");
 const bookingRepository = require("../repositories/bookingRepository");
 
 const createBooking = async (customerId, data) => {
@@ -35,7 +36,11 @@ const createBooking = async (customerId, data) => {
     throw error;
   }
 
-  if (!["Male", "Female", "Other"].includes(gender)) {
+  const normalizedGender = typeof gender === "string"
+    ? gender.trim().charAt(0).toUpperCase() + gender.trim().slice(1).toLowerCase()
+    : "";
+
+  if (!["Male", "Female", "Other"].includes(normalizedGender)) {
     const error = new Error("Invalid gender");
     error.statusCode = 400;
     throw error;
@@ -60,7 +65,7 @@ const createBooking = async (customerId, data) => {
     patientName: patientName.trim(),
     testName: testName.trim(),
     age: Number(age),
-    gender,
+    gender: normalizedGender,
     phone: phone.trim(),
     email: email.trim().toLowerCase(),
     bookingDate: parsedDate,
@@ -72,6 +77,62 @@ const createBooking = async (customerId, data) => {
 };
 
 
+const getCustomerBookings = (customerId) =>
+  bookingRepository.findBookingsByCustomer(customerId);
+
+const getBookingById = (bookingId, customerId) => {
+  if (!mongoose.Types.ObjectId.isValid(bookingId)) {
+    const error = new Error("Invalid booking ID");
+    error.statusCode = 400;
+    throw error;
+  }
+  return bookingRepository.findBookingById(bookingId, customerId);
+};
+
+const updateCustomerBooking = async (bookingId, customerId, data) => {
+  if (!mongoose.Types.ObjectId.isValid(bookingId)) {
+    const error = new Error("Invalid booking ID");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const allowedFields = ["patientName", "testName", "age", "gender", "phone", "email", "bookingDate", "timeSlot", "notes"];
+  const updateData = {};
+  allowedFields.forEach((field) => {
+    if (data[field] !== undefined) updateData[field] = data[field];
+  });
+
+  if (updateData.gender) {
+    updateData.gender = updateData.gender.trim().charAt(0).toUpperCase() + updateData.gender.trim().slice(1).toLowerCase();
+    if (!["Male", "Female", "Other"].includes(updateData.gender)) {
+      const error = new Error("Invalid gender");
+      error.statusCode = 400;
+      throw error;
+    }
+  }
+
+  if (Object.keys(updateData).length === 0) {
+    const error = new Error("No valid fields provided for update");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  return bookingRepository.updateBooking(bookingId, customerId, updateData);
+};
+
+const deleteCustomerBooking = (bookingId, customerId) => {
+  if (!mongoose.Types.ObjectId.isValid(bookingId)) {
+    const error = new Error("Invalid booking ID");
+    error.statusCode = 400;
+    throw error;
+  }
+  return bookingRepository.deleteBooking(bookingId, customerId);
+};
+
 module.exports = {
-  createBooking
+  createBooking,
+  getCustomerBookings,
+  getBookingById,
+  updateCustomerBooking,
+  deleteCustomerBooking
 };
