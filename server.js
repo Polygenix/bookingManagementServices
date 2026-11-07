@@ -33,11 +33,15 @@ app.use("/api/customer/bookings", bookingRoutes);
 app.use("/api/admin", adminRoutes);
 
 // Default Route
+// app.get("/", (req, res) => {
+//   res.json({
+//     success: true,
+//     message: "Booking API is running"
+//   });
+// });
+
 app.get("/", (req, res) => {
-  res.json({
-    success: true,
-    message: "Booking API is running"
-  });
+  res.redirect("/BookingManagementServices");
 });
 
 const PORT = process.env.PORT || 5002;

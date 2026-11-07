@@ -36,6 +36,15 @@ const createBooking = async (customerId, data) => {
     throw error;
   }
 
+  const normalizedEmail = email.trim().toLowerCase();
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!emailRegex.test(normalizedEmail)) {
+    const error = new Error("Invalid email address");
+    error.statusCode = 400;
+    throw error;
+  }
+
   const normalizedGender = typeof gender === "string"
     ? gender.trim().charAt(0).toUpperCase() + gender.trim().slice(1).toLowerCase()
     : "";
@@ -67,7 +76,7 @@ const createBooking = async (customerId, data) => {
     age: Number(age),
     gender: normalizedGender,
     phone: phone.trim(),
-    email: email.trim().toLowerCase(),
+    email: normalizedEmail,
     bookingDate: parsedDate,
     timeSlot: timeSlot.trim(),
     notes: notes || ""

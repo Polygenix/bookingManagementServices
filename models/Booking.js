@@ -44,7 +44,8 @@ const bookingSchema = new mongoose.Schema(
       type: String,
       required: true,
       lowercase: true,
-      trim: true
+      trim: true,
+      match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Invalid email address"]
     },
 
     bookingDate: {
