@@ -10,6 +10,7 @@ const adminRoutes = require("./routes/adminRoutes");
 
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./docs/swagger");
+const testRoutes = require("./routes/testRoutes");
 
 const app = express();
 
@@ -18,7 +19,7 @@ app.use(express.json());
 
 // Auth APIs
 app.use("/api/auth", authRoutes);
-
+app.use("/api/admin/tests", testRoutes);
 // Swagger
 app.use(
   "/BookingManagementServices",
