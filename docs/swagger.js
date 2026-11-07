@@ -1,4 +1,3 @@
-
 const swaggerSpec = {
   openapi: "3.0.3",
 
@@ -719,7 +718,6 @@ const swaggerSpec = {
         responses: {
           201: {
             description: "File uploaded successfully",
-            
           },
 
           400: {
