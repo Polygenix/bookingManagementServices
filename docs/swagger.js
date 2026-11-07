@@ -695,7 +695,6 @@ const swaggerSpec = {
         summary: "Upload Image or PDF",
         description:
           "Common API to upload images and PDF files for Admin and Customer",
-        security: [{ BearerAuth: [] }],
 
         requestBody: {
           required: true,
