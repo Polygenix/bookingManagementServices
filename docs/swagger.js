@@ -18,7 +18,7 @@ const swaggerSpec = {
     tags: [
       { name: "Authentication" },
       { name: "Customer Booking" },
-      { name: "Admin Booking" }
+      { name: "Admin" }
     ],
 
     components: {
