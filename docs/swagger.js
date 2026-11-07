@@ -18,7 +18,7 @@ const swaggerSpec = {
     tags: [
       { name: "Authentication" },
       { name: "Customer Booking" },
-      { name: "Admin " }
+      { name: "Admin Booking" }
     ],
 
     components: {
@@ -247,7 +247,7 @@ const swaggerSpec = {
 
       "/api/admin/bookings": {
         get: {
-          tags: ["Admin"],
+          tags: ["Admin Booking"],
           summary: "Get All Customer Bookings",
           description: "Admin can view all customer bookings",
           security: [{ BearerAuth: [] }],
