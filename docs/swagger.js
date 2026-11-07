@@ -246,7 +246,7 @@ const swaggerSpec = {
 
       "/api/admin/bookings": {
         get: {
-          tags: ["Admin Booking"],
+          tags: ["Admin"],
           summary: "Get All Customer Bookings",
           description: "Admin can view all customer bookings",
           security: [{ BearerAuth: [] }],
