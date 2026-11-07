@@ -8,14 +8,14 @@ const swaggerSpec = {
   },
 
   servers: [
-    {
-      url: "http://localhost:5002",
-      description: "Local Server",
-    },
     // {
-    //   url: "https://bookingmanagementservices.onrender.com",
-    //   description: "Production Server",
+    //   url: "http://localhost:5002",
+    //   description: "Local Server",
     // },
+    {
+      url: "https://bookingmanagementservices.onrender.com",
+      description: "Production Server",
+    },
   ],
 
   tags: [
