@@ -480,133 +480,188 @@ const swaggerSpec = {
     },
     // ADMIN TEST MANAGEMENT APIs
 
-"/api/admin/tests": {
-  post: {
-    tags: ["Admin Test Management"],
-    summary: "Create Test",
-    description: "Admin can create a new medical test",
-    security: [{ BearerAuth: [] }],
+    "/api/admin/tests": {
+      post: {
+        tags: ["Admin Test Management"],
+        summary: "Create Test",
+        description: "Admin can create a new medical test",
+        security: [{ BearerAuth: [] }],
 
-    requestBody: {
-      required: true,
-      content: {
-        "application/json": {
-          schema: {
-            type: "object",
-            required: ["testName", "price", "duration"],
-            properties: {
-              testName: {
-                type: "string",
-                example: "Complete Blood Count (CBC)",
-              },
-              description: {
-                type: "string",
-                example: "Blood test to check overall health",
-              },
-              price: {
-                type: "number",
-                example: 500,
-              },
-              preparationInstructions: {
-                type: "string",
-                example: "No fasting required",
-              },
-              duration: {
-                type: "string",
-                example: "24 hours",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["testName", "price", "duration"],
+                properties: {
+                  testName: {
+                    type: "string",
+                    example: "Complete Blood Count (CBC)",
+                  },
+                  description: {
+                    type: "string",
+                    example: "Blood test to check overall health",
+                  },
+                  price: {
+                    type: "number",
+                    example: 500,
+                  },
+                  preparationInstructions: {
+                    type: "string",
+                    example: "No fasting required",
+                  },
+                  duration: {
+                    type: "string",
+                    example: "24 hours",
+                  },
+                },
               },
             },
+          },
+        },
+
+        responses: {
+          201: {
+            description: "Test created successfully",
+          },
+          400: {
+            description: "Invalid test details",
+          },
+          401: {
+            description: "Token required",
+          },
+          403: {
+            description: "Admin access required",
+          },
+          500: {
+            description: "Internal server error",
+          },
+        },
+      },
+
+      get: {
+        tags: ["Admin Test Management"],
+        summary: "Get All Tests",
+        description: "Admin can view all medical tests",
+        security: [{ BearerAuth: [] }],
+
+        responses: {
+          200: {
+            description: "Tests fetched successfully",
+          },
+          401: {
+            description: "Token required",
+          },
+          403: {
+            description: "Admin access required",
+          },
+          500: {
+            description: "Internal server error",
           },
         },
       },
     },
 
-    responses: {
-      201: {
-        description: "Test created successfully",
-      },
-      400: {
-        description: "Invalid test details",
-      },
-      401: {
-        description: "Token required",
-      },
-      403: {
-        description: "Admin access required",
-      },
-      500: {
-        description: "Internal server error",
-      },
-    },
-  },
+    "/api/admin/tests/{id}": {
+      get: {
+        tags: ["Admin Test Management"],
+        summary: "Get Single Test",
+        description: "Admin can view test details by ID",
+        security: [{ BearerAuth: [] }],
 
-  get: {
-    tags: ["Admin Test Management"],
-    summary: "Get All Tests",
-    description: "Admin can view all medical tests",
-    security: [{ BearerAuth: [] }],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+              example: "672a12345678901234567890",
+            },
+            description: "Test ID",
+          },
+        ],
 
-    responses: {
-      200: {
-        description: "Tests fetched successfully",
-      },
-      401: {
-        description: "Token required",
-      },
-      403: {
-        description: "Admin access required",
-      },
-      500: {
-        description: "Internal server error",
-      },
-    },
-  },
-},
-
-"/api/admin/tests/{id}": {
-  get: {
-    tags: ["Admin Test Management"],
-    summary: "Get Single Test",
-    description: "Admin can view test details by ID",
-    security: [{ BearerAuth: [] }],
-
-    parameters: [
-      {
-        name: "id",
-        in: "path",
-        required: true,
-        schema: {
-          type: "string",
-          example: "672a12345678901234567890",
+        responses: {
+          200: {
+            description: "Test fetched successfully",
+          },
+          400: {
+            description: "Invalid test ID",
+          },
+          401: {
+            description: "Token required",
+          },
+          403: {
+            description: "Admin access required",
+          },
+          404: {
+            description: "Test not found",
+          },
+          500: {
+            description: "Internal server error",
+          },
         },
-        description: "Test ID",
       },
-    ],
+      put: {
+      tags: ["Admin Test Management"],
+      summary: "Update Test",
+      description: "Admin can update existing test details",
+      security: [{ BearerAuth: [] }],
 
-    responses: {
-      200: {
-        description: "Test fetched successfully",
+      parameters: [
+        {
+          name: "id",
+          in: "path",
+          required: true,
+          schema: {
+            type: "string",
+            example: "672a12345678901234567890"
+          }
+        }
+      ],
+
+
+      responses: {
+        200: { description: "Test updated successfully" },
+        400: { description: "Invalid test ID or update data" },
+        401: { description: "Token required" },
+        403: { description: "Admin access required" },
+        404: { description: "Test not found" },
+        500: { description: "Internal server error" }
+      }
       },
-      400: {
-        description: "Invalid test ID",
-      },
-      401: {
-        description: "Token required",
-      },
-      403: {
-        description: "Admin access required",
-      },
-      404: {
-        description: "Test not found",
-      },
-      500: {
-        description: "Internal server error",
-      },
+      delete: {
+      tags: ["Admin Test Management"],
+      summary: "Delete Test",
+      description: "Admin can delete a medical test",
+      security: [{ BearerAuth: [] }],
+
+      parameters: [
+        {
+          name: "id",
+          in: "path",
+          required: true,
+          schema: {
+            type: "string",
+            example: "672a12345678901234567890"
+          },
+          description: "Test ID"
+        }
+      ],
+
+      responses: {
+        200: { description: "Test deleted successfully" },
+        400: { description: "Invalid test ID" },
+        401: { description: "Token required" },
+        403: { description: "Admin access required" },
+        404: { description: "Test not found" },
+        500: { description: "Internal server error" }
+      }
+      }
     },
-  },
-},
 
-    
   },
 };
 

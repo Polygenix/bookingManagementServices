@@ -67,8 +67,83 @@ const getTestById = async (id) => {
   return test;
 };
 
+const updateTest = async (id, data) => {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    const error = new Error("Invalid test ID");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const allowedFields = [
+    "testName",
+    "description",
+    "price",
+    "preparationInstructions",
+    "duration",
+    "isActive"
+  ];
+
+  const updateData = {};
+
+  allowedFields.forEach((field) => {
+    if (data[field] !== undefined) {
+      updateData[field] = data[field];
+    }
+  });
+
+  if (Object.keys(updateData).length === 0) {
+    const error = new Error("No valid fields provided for update");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  if (
+    updateData.price !== undefined &&
+    (
+      typeof updateData.price !== "number" ||
+      !Number.isFinite(updateData.price) ||
+      updateData.price < 0
+    )
+  ) {
+    const error = new Error("Invalid test price");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const test = await testRepository.updateTest(id, updateData);
+
+  if (!test) {
+    const error = new Error("Test not found");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  return test;
+};
+
+const deleteTest = async (id) => {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    const error = new Error("Invalid test ID");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const test = await testRepository.deleteTest(id);
+
+  if (!test) {
+    const error = new Error("Test not found");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  return test;
+};
+
 module.exports = {
   createTest,
   getAllTests,
-  getTestById
+  getTestById,  
+  updateTest,
+  deleteTest
+
 };

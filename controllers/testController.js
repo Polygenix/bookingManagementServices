@@ -55,8 +55,46 @@ const getTestById = async (req, res) => {
   }
 };
 
+const updateTest = async (req, res) => {
+  try {
+    const test = await testService.updateTest(
+      req.params.id,
+      req.body
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Test updated successfully",
+      data: test
+    });
+  } catch (error) {
+    res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+const deleteTest = async (req, res) => {
+  try {
+    const test = await testService.deleteTest(req.params.id);
+
+    res.status(200).json({
+      success: true,
+      message: "Test deleted successfully",
+      data: test
+    });
+  } catch (error) {
+    res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
 module.exports = {
   createTest,
   getAllTests,
-  getTestById
+  getTestById,
+  updateTest,
+  deleteTest
 };

@@ -31,5 +31,17 @@ router.get(
   authorize("admin"),
   testController.getTestById
 );
+router.put(
+  "/:id",
+  authenticate,
+  authorize("admin"),
+  testController.updateTest
+);
+router.delete(
+  "/:id",
+  authenticate,
+  authorize("admin"),
+  testController.deleteTest
+);
 
 module.exports = router;

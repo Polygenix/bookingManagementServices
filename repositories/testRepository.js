@@ -15,8 +15,21 @@ const getTestById = async (id) => {
   return await Test.findById(id);
 };
 
+const updateTest = async (id, updateData) => {
+  return await Test.findByIdAndUpdate(id, updateData, {
+    new: true,
+    runValidators: true
+  });
+};
+
+const deleteTest = async (id) => {
+  return await Test.findByIdAndDelete(id);
+};
+
 module.exports = {
   createTest,
   getAllTests,
-  getTestById
+  getTestById,
+  updateTest,
+  deleteTest
 };
