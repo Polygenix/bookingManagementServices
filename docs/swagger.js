@@ -672,21 +672,21 @@ const swaggerSpec = {
     // CUSTOMER TEST MANAGEMENT APIs
     // =========================================
 
-    "/api/customer/tests": {
-      get: {
-        tags: ["Customer Test Management"],
-        summary: "Get All Available Tests",
-        description: "Customer can view all active medical tests",
-        security: [{ BearerAuth: [] }],
+    // "/api/customer/tests": {
+    //   get: {
+    //     tags: ["Customer Test Management"],
+    //     summary: "Get All Available Tests",
+    //     description: "Customer can view all active medical tests",
+    //     security: [{ BearerAuth: [] }],
 
-        responses: {
-          200: { description: "Available tests fetched successfully" },
-          401: { description: "Token required" },
-          403: { description: "Customer access required" },
-          500: { description: "Internal server error" },
-        },
-      },
-    },
+    //     responses: {
+    //       200: { description: "Available tests fetched successfully" },
+    //       401: { description: "Token required" },
+    //       403: { description: "Customer access required" },
+    //       500: { description: "Internal server error" },
+    //     },
+    //   },
+    // },
 
     // =========================================
     // COMMON FILE UPLOAD API
