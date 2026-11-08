@@ -27,7 +27,7 @@ const swaggerSpec = {
     { name: "Customer Booking" },
     { name: "Admin Booking" },
     { name: "Admin Test Management" },
-    { name: "Customer Test Management" },
+    // { name: "Customer Test Management" },
     { name: "Common APIs" },
   ],
 
