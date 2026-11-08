@@ -12,8 +12,12 @@ const swaggerSpec = {
     //   url: "http://localhost:5002",
     //   description: "Local Server",
     // },
+    // {
+    //   url: "https://bookingmanagementservices.onrender.com",
+    //   description: "Production Server",
+    // },
     {
-      url: "https://bookingmanagementservices.onrender.com",
+      url: "https://api.devankit.co.in",
       description: "Production Server",
     },
   ],
