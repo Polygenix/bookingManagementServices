@@ -1,4 +1,3 @@
-
 const swaggerSpec = {
   openapi: "3.0.3",
 
