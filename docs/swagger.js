@@ -1360,6 +1360,215 @@ const swaggerSpec = {
         },
       },
     },
+
+    // =========================================
+    //address APIs
+    // =========================================
+
+    "/api/customer/addresses": {
+      post: {
+        tags: ["Customer Address"],
+        summary: "Add Customer Address",
+        description: "Customer can save a new address",
+        security: [{ BearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: [
+                  "fullName",
+                  "phone",
+                  "houseNo",
+                  "street",
+                  "city",
+                  "state",
+                  "pincode",
+                ],
+                properties: {
+                  addressType: {
+                    type: "string",
+                    enum: ["Home", "Office", "Other"],
+                    example: "Home",
+                  },
+                  fullName: {
+                    type: "string",
+                    example: "Ankit Kumar",
+                  },
+                  phone: {
+                    type: "string",
+                    example: "9876543210",
+                  },
+                  houseNo: {
+                    type: "string",
+                    example: "H-22",
+                  },
+                  street: {
+                    type: "string",
+                    example: "Sector 15",
+                  },
+                  landmark: {
+                    type: "string",
+                    example: "Near Metro Station",
+                  },
+                  city: {
+                    type: "string",
+                    example: "Faridabad",
+                  },
+                  state: {
+                    type: "string",
+                    example: "Haryana",
+                  },
+                  pincode: {
+                    type: "string",
+                    example: "121001",
+                  },
+                  latitude: {
+                    type: "number",
+                    example: 28.4089,
+                  },
+                  longitude: {
+                    type: "number",
+                    example: 77.3178,
+                  },
+                  isDefault: {
+                    type: "boolean",
+                    example: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          201: { description: "Address added successfully" },
+          400: { description: "Validation error" },
+          401: { description: "Unauthorized" },
+          403: { description: "Customer access required" },
+        },
+      },
+
+      get: {
+        tags: ["Customer Address"],
+        summary: "Get All Saved Addresses",
+        security: [{ BearerAuth: [] }],
+        responses: {
+          200: { description: "Addresses fetched successfully" },
+          401: { description: "Unauthorized" },
+        },
+      },
+    },
+
+    "/api/customer/addresses/{id}": {
+      get: {
+        tags: ["Customer Address"],
+        summary: "Get Address By ID",
+        security: [{ BearerAuth: [] }],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+              example: "672a12345678901234567890",
+            },
+          },
+        ],
+        responses: {
+          200: { description: "Address fetched successfully" },
+          400: { description: "Invalid address ID" },
+          404: { description: "Address not found" },
+        },
+      },
+
+      put: {
+        tags: ["Customer Address"],
+        summary: "Update Address",
+        security: [{ BearerAuth: [] }],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: { type: "string" },
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  addressType: {
+                    type: "string",
+                    enum: ["Home", "Office", "Other"],
+                  },
+                  fullName: { type: "string" },
+                  phone: { type: "string" },
+                  houseNo: { type: "string" },
+                  street: { type: "string" },
+                  landmark: { type: "string" },
+                  city: { type: "string" },
+                  state: { type: "string" },
+                  pincode: { type: "string" },
+                  latitude: { type: "number" },
+                  longitude: { type: "number" },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          200: { description: "Address updated successfully" },
+          400: { description: "Invalid address ID or data" },
+          404: { description: "Address not found" },
+        },
+      },
+
+      delete: {
+        tags: ["Customer Address"],
+        summary: "Delete Address",
+        security: [{ BearerAuth: [] }],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: { type: "string" },
+          },
+        ],
+        responses: {
+          200: { description: "Address deleted successfully" },
+          400: { description: "Invalid address ID" },
+          404: { description: "Address not found" },
+        },
+      },
+    },
+
+    "/api/customer/addresses/{id}/default": {
+      put: {
+        tags: ["Customer Address"],
+        summary: "Set Default Address",
+        description: "Set a saved address as the customer's default address",
+        security: [{ BearerAuth: [] }],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: { type: "string" },
+          },
+        ],
+        responses: {
+          200: { description: "Default address updated successfully" },
+          400: { description: "Invalid address ID" },
+          404: { description: "Address not found" },
+        },
+      },
+    },
   },
 };
 
