@@ -1,7 +1,7 @@
 
 const Test = require("../models/Test");
 
-// Get All Active Tests
+// Get Active Tests
 const getAllActiveTests = async () => {
   return await Test.find({ isActive: true })
     .sort({ createdAt: -1 });

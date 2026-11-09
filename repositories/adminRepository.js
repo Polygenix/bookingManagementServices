@@ -1,43 +1,42 @@
-const Booking = require("../models/Booking");
 
-const findAllBookings = async () => {
-  return await Booking.find()
-    .populate("customer", "name email")
-    .sort({ createdAt: -1 });
-};
-const findBookingById = async (id) => {
-  return await Booking.findById(id)
-    .populate("customer", "name email");
+const Test = require("../models/Test");
+
+// Create Test
+const createTest = async (data) => {
+  return await Test.create(data);
 };
 
-const updateBookingStatus = async (id, status) => {
-  return await Booking.findByIdAndUpdate(
+// Get All Tests
+const getAllTests = async () => {
+  return await Test.find().sort({ createdAt: -1 });
+};
+
+// Get Test By ID
+const getTestById = async (id) => {
+  return await Test.findById(id);
+};
+
+// Update Test
+const updateTest = async (id, updateData) => {
+  return await Test.findByIdAndUpdate(
     id,
-    { status },
-    { new: true, runValidators: true }
-  ).populate("customer", "name email");
-};
-
-const updateBooking = async (id, updateData) => {
-  return await Booking.findByIdAndUpdate(
-    id,
-    updateData,
+    { $set: updateData },
     {
       new: true,
       runValidators: true
     }
-  ).populate("customer", "name email");
+  );
 };
 
-const deleteBooking = async (id) => {
-  return await Booking.findByIdAndDelete(id);
+// Delete Test
+const deleteTest = async (id) => {
+  return await Test.findByIdAndDelete(id);
 };
-
 
 module.exports = {
-  findAllBookings,
-  findBookingById,
-  updateBookingStatus,
-  updateBooking,
-  deleteBooking
+  createTest,
+  getAllTests,
+  getTestById,
+  updateTest,
+  deleteTest
 };

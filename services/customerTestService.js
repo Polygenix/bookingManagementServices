@@ -2,7 +2,7 @@
 const mongoose = require("mongoose");
 const customerTestRepository = require("../repositories/customerTestRepository");
 
-// Get All Active Tests
+// Get Active Tests
 const getAllActiveTests = async () => {
   return await customerTestRepository.getAllActiveTests();
 };
@@ -18,7 +18,7 @@ const getActiveTestById = async (id) => {
   const test = await customerTestRepository.getActiveTestById(id);
 
   if (!test) {
-    const error = new Error("Test not found or inactive");
+    const error = new Error("Test not found");
     error.statusCode = 404;
     throw error;
   }

@@ -476,196 +476,274 @@ const swaggerSpec = {
     // ADMIN TEST MANAGEMENT APIs
     // =========================================
 
-    "/api/admin/tests": {
-      post: {
-        tags: ["Admin Test Management"],
-        summary: "Create Test",
-        description: "Admin can create a new medical test",
-        security: [{ BearerAuth: [] }],
+   
+"/api/admin/tests": {
+  // CREATE TEST
+  post: {
+    tags: ["Admin Test Management"],
+    summary: "Create Test",
+    description: "Admin can create a new medical test",
+    security: [{ BearerAuth: [] }],
 
-        requestBody: {
-          required: true,
-          content: {
-            "application/json": {
-              schema: {
-                type: "object",
-                required: ["testName", "price", "duration"],
-                properties: {
-                  testName: {
-                    type: "string",
-                    example: "Complete Blood Count (CBC)",
-                  },
-                  description: {
-                    type: "string",
-                    example: "Blood test to check overall health",
-                  },
-                  price: {
-                    type: "number",
-                    example: 500,
-                  },
-                  preparationInstructions: {
-                    type: "string",
-                    example: "No fasting required",
-                  },
-                  duration: {
-                    type: "string",
-                    example: "24 hours",
-                  },
-                },
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            required: ["testName", "price", "duration"],
+            properties: {
+              testName: {
+                type: "string",
+                example: "Complete Blood Count (CBC)"
               },
-            },
-          },
-        },
-
-        responses: {
-          201: { description: "Test created successfully" },
-          400: { description: "Invalid test details" },
-          401: { description: "Token required" },
-          403: { description: "Admin access required" },
-          500: { description: "Internal server error" },
-        },
-      },
-
-      get: {
-        tags: ["Admin Test Management"],
-        summary: "Get All Tests",
-        description: "Admin can view all medical tests",
-        security: [{ BearerAuth: [] }],
-
-        responses: {
-          200: { description: "Tests fetched successfully" },
-          401: { description: "Token required" },
-          403: { description: "Admin access required" },
-          500: { description: "Internal server error" },
-        },
-      },
+              description: {
+                type: "string",
+                example: "Blood test to check overall health"
+              },
+              imageUrl: {
+                type: "string",
+                example: "https://example.com/images/cbc-test.png",
+                description: "Medical test image URL"
+              },
+              price: {
+                type: "number",
+                example: 500
+              },
+              preparationInstructions: {
+                type: "string",
+                example: "No fasting required"
+              },
+              duration: {
+                type: "string",
+                example: "24 hours"
+              },
+              isActive: {
+                type: "boolean",
+                example: true
+              }
+            }
+          }
+        }
+      }
     },
 
-    "/api/admin/tests/{id}": {
-      get: {
-        tags: ["Admin Test Management"],
-        summary: "Get Single Test",
-        description: "Admin can view test details by ID",
-        security: [{ BearerAuth: [] }],
+    responses: {
+      201: { description: "Test created successfully" },
+      400: { description: "Validation error" },
+      401: { description: "Unauthorized" },
+      403: { description: "Admin access required" }
+    }
+  },
 
-        parameters: [
-          {
-            name: "id",
-            in: "path",
-            required: true,
+  // GET ALL TESTS
+  get: {
+    tags: ["Admin Test Management"],
+    summary: "Get All Tests",
+    description: "Admin can view all medical tests including active and inactive tests",
+    security: [{ BearerAuth: [] }],
+
+    responses: {
+      200: {
+        description: "All tests fetched successfully",
+        content: {
+          "application/json": {
             schema: {
-              type: "string",
-              example: "672a12345678901234567890",
-            },
-            description: "Test ID",
-          },
-        ],
-
-        responses: {
-          200: { description: "Test fetched successfully" },
-          400: { description: "Invalid test ID" },
-          401: { description: "Token required" },
-          403: { description: "Admin access required" },
-          404: { description: "Test not found" },
-          500: { description: "Internal server error" },
-        },
-      },
-
-      put: {
-        tags: ["Admin Test Management"],
-        summary: "Update Test",
-        description: "Admin can update existing test details",
-        security: [{ BearerAuth: [] }],
-
-        parameters: [
-          {
-            name: "id",
-            in: "path",
-            required: true,
-            schema: {
-              type: "string",
-              example: "672a12345678901234567890",
-            },
-            description: "Test ID",
-          },
-        ],
-
-        requestBody: {
-          required: true,
-          content: {
-            "application/json": {
-              schema: {
-                type: "object",
-                properties: {
-                  testName: {
-                    type: "string",
-                    example: "Complete Blood Count",
-                  },
-                  description: {
-                    type: "string",
-                    example: "Updated blood test description",
-                  },
-                  price: {
-                    type: "number",
-                    example: 600,
-                  },
-                  preparationInstructions: {
-                    type: "string",
-                    example: "Fasting required for 8 hours",
-                  },
-                  duration: {
-                    type: "string",
-                    example: "12 hours",
-                  },
-                  isActive: {
-                    type: "boolean",
-                    example: true,
-                  },
+              type: "object",
+              properties: {
+                success: {
+                  type: "boolean",
+                  example: true
                 },
+                total: {
+                  type: "number",
+                  example: 2
+                },
+                data: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      _id: {
+                        type: "string",
+                        example: "672a12345678901234567890"
+                      },
+                      testName: {
+                        type: "string",
+                        example: "Complete Blood Count (CBC)"
+                      },
+                      description: {
+                        type: "string",
+                        example: "Blood test to check overall health"
+                      },
+                      imageUrl: {
+                        type: "string",
+                        example: "https://example.com/images/cbc-test.png"
+                      },
+                      price: {
+                        type: "number",
+                        example: 500
+                      },
+                      preparationInstructions: {
+                        type: "string",
+                        example: "No fasting required"
+                      },
+                      duration: {
+                        type: "string",
+                        example: "24 hours"
+                      },
+                      isActive: {
+                        type: "boolean",
+                        example: true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      401: { description: "Token required" },
+      403: { description: "Admin access required" },
+      500: { description: "Internal server error" }
+    }
+  }
+},
+
+"/api/admin/tests/{id}": {
+  // GET SINGLE TEST
+  get: {
+    tags: ["Admin Test Management"],
+    summary: "Get Single Test",
+    description: "Admin can view test details by ID",
+    security: [{ BearerAuth: [] }],
+
+    parameters: [
+      {
+        name: "id",
+        in: "path",
+        required: true,
+        schema: {
+          type: "string",
+          example: "672a12345678901234567890"
+        },
+        description: "Test ID"
+      }
+    ],
+
+    responses: {
+      200: { description: "Test fetched successfully" },
+      400: { description: "Invalid test ID" },
+      401: { description: "Token required" },
+      403: { description: "Admin access required" },
+      404: { description: "Test not found" },
+      500: { description: "Internal server error" }
+    }
+  },
+
+  // UPDATE TEST
+  put: {
+    tags: ["Admin Test Management"],
+    summary: "Update Test",
+    description: "Admin can update existing test details",
+    security: [{ BearerAuth: [] }],
+
+    parameters: [
+      {
+        name: "id",
+        in: "path",
+        required: true,
+        schema: {
+          type: "string",
+          example: "672a12345678901234567890"
+        },
+        description: "Test ID"
+      }
+    ],
+
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              testName: {
+                type: "string",
+                example: "Complete Blood Count"
               },
-            },
-          },
-        },
-
-        responses: {
-          200: { description: "Test updated successfully" },
-          400: { description: "Invalid test ID or update data" },
-          401: { description: "Token required" },
-          403: { description: "Admin access required" },
-          404: { description: "Test not found" },
-          500: { description: "Internal server error" },
-        },
-      },
-
-      delete: {
-        tags: ["Admin Test Management"],
-        summary: "Delete Test",
-        description: "Admin can delete a medical test",
-        security: [{ BearerAuth: [] }],
-
-        parameters: [
-          {
-            name: "id",
-            in: "path",
-            required: true,
-            schema: {
-              type: "string",
-              example: "672a12345678901234567890",
-            },
-            description: "Test ID",
-          },
-        ],
-
-        responses: {
-          200: { description: "Test deleted successfully" },
-          400: { description: "Invalid test ID" },
-          401: { description: "Token required" },
-          403: { description: "Admin access required" },
-          404: { description: "Test not found" },
-          500: { description: "Internal server error" },
-        },
-      },
+              description: {
+                type: "string",
+                example: "Updated blood test description"
+              },
+              imageUrl: {
+                type: "string",
+                example: "https://example.com/images/updated-cbc.png",
+                description: "Updated medical test image URL"
+              },
+              price: {
+                type: "number",
+                example: 600
+              },
+              preparationInstructions: {
+                type: "string",
+                example: "Fasting required for 8 hours"
+              },
+              duration: {
+                type: "string",
+                example: "12 hours"
+              },
+              isActive: {
+                type: "boolean",
+                example: true
+              }
+            }
+          }
+        }
+      }
     },
+
+    responses: {
+      200: { description: "Test updated successfully" },
+      400: { description: "Invalid test ID or update data" },
+      401: { description: "Token required" },
+      403: { description: "Admin access required" },
+      404: { description: "Test not found" },
+      500: { description: "Internal server error" }
+    }
+  },
+
+  // DELETE TEST
+  delete: {
+    tags: ["Admin Test Management"],
+    summary: "Delete Test",
+    description: "Admin can delete a medical test",
+    security: [{ BearerAuth: [] }],
+
+    parameters: [
+      {
+        name: "id",
+        in: "path",
+        required: true,
+        schema: {
+          type: "string",
+          example: "672a12345678901234567890"
+        },
+        description: "Test ID"
+      }
+    ],
+
+    responses: {
+      200: { description: "Test deleted successfully" },
+      400: { description: "Invalid test ID" },
+      401: { description: "Token required" },
+      403: { description: "Admin access required" },
+      404: { description: "Test not found" },
+      500: { description: "Internal server error" }
+    }
+  }
+},
 
     // =========================================
     // CUSTOMER TEST MANAGEMENT APIs

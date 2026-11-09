@@ -1,22 +1,20 @@
+
 const mongoose = require("mongoose");
-const testRepository = require("../repositories/testRepository");
+const adminRepository = require("../repositories/adminRepository");
 
 // Create Test
 const createTest = async (data) => {
   const {
     testName,
     description,
+    imageUrl,
     price,
     preparationInstructions,
-    duration
+    duration,
+    isActive
   } = data;
 
-  if (
-    !testName ||
-    typeof testName !== "string" ||
-    price === undefined ||
-    !duration
-  ) {
+  if (!testName || price === undefined || !duration) {
     const error = new Error(
       "Test name, price and duration are required"
     );
@@ -25,28 +23,30 @@ const createTest = async (data) => {
   }
 
   if (
-    typeof price !== "number" ||
-    !Number.isFinite(price) ||
-    price < 0
+    !Number.isFinite(Number(price)) ||
+    Number(price) < 0
   ) {
     const error = new Error("Invalid test price");
     error.statusCode = 400;
     throw error;
   }
 
-  return await testRepository.createTest({
+  return await adminRepository.createTest({
     testName,
     description,
-    price,
+    imageUrl,
+    price: Number(price),
     preparationInstructions,
-    duration
+    duration,
+    ...(isActive !== undefined && { isActive })
   });
 };
 
 // Get All Tests
 const getAllTests = async () => {
-  return await testRepository.getAllTests();
+  return await adminRepository.getAllTests();
 };
+
 
 // Get Test By ID
 const getTestById = async (id) => {
@@ -56,7 +56,7 @@ const getTestById = async (id) => {
     throw error;
   }
 
-  const test = await testRepository.getTestById(id);
+  const test = await adminRepository.getTestById(id);
 
   if (!test) {
     const error = new Error("Test not found");
@@ -67,6 +67,7 @@ const getTestById = async (id) => {
   return test;
 };
 
+// Update Test
 const updateTest = async (id, data) => {
   if (!mongoose.Types.ObjectId.isValid(id)) {
     const error = new Error("Invalid test ID");
@@ -77,6 +78,7 @@ const updateTest = async (id, data) => {
   const allowedFields = [
     "testName",
     "description",
+    "imageUrl",
     "price",
     "preparationInstructions",
     "duration",
@@ -92,25 +94,25 @@ const updateTest = async (id, data) => {
   });
 
   if (Object.keys(updateData).length === 0) {
-    const error = new Error("No valid fields provided for update");
+    const error = new Error("No valid fields provided");
     error.statusCode = 400;
     throw error;
   }
 
-  if (
-    updateData.price !== undefined &&
-    (
-      typeof updateData.price !== "number" ||
-      !Number.isFinite(updateData.price) ||
-      updateData.price < 0
-    )
-  ) {
-    const error = new Error("Invalid test price");
-    error.statusCode = 400;
-    throw error;
+  if (updateData.price !== undefined) {
+    if (
+      !Number.isFinite(Number(updateData.price)) ||
+      Number(updateData.price) < 0
+    ) {
+      const error = new Error("Invalid test price");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    updateData.price = Number(updateData.price);
   }
 
-  const test = await testRepository.updateTest(id, updateData);
+  const test = await adminRepository.updateTest(id, updateData);
 
   if (!test) {
     const error = new Error("Test not found");
@@ -121,6 +123,7 @@ const updateTest = async (id, data) => {
   return test;
 };
 
+// Delete Test
 const deleteTest = async (id) => {
   if (!mongoose.Types.ObjectId.isValid(id)) {
     const error = new Error("Invalid test ID");
@@ -128,7 +131,7 @@ const deleteTest = async (id) => {
     throw error;
   }
 
-  const test = await testRepository.deleteTest(id);
+  const test = await adminRepository.deleteTest(id);
 
   if (!test) {
     const error = new Error("Test not found");
@@ -142,8 +145,7 @@ const deleteTest = async (id) => {
 module.exports = {
   createTest,
   getAllTests,
-  getTestById,  
+  getTestById,
   updateTest,
   deleteTest
-
 };
