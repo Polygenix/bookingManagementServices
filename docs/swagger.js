@@ -476,274 +476,274 @@ const swaggerSpec = {
     // ADMIN TEST MANAGEMENT APIs
     // =========================================
 
-   
-"/api/admin/tests": {
-  // CREATE TEST
-  post: {
-    tags: ["Admin Test Management"],
-    summary: "Create Test",
-    description: "Admin can create a new medical test",
-    security: [{ BearerAuth: [] }],
+    "/api/admin/tests": {
+      // CREATE TEST
+      post: {
+        tags: ["Admin Test Management"],
+        summary: "Create Test",
+        description: "Admin can create a new medical test",
+        security: [{ BearerAuth: [] }],
 
-    requestBody: {
-      required: true,
-      content: {
-        "application/json": {
-          schema: {
-            type: "object",
-            required: ["testName", "price", "duration"],
-            properties: {
-              testName: {
-                type: "string",
-                example: "Complete Blood Count (CBC)"
-              },
-              description: {
-                type: "string",
-                example: "Blood test to check overall health"
-              },
-              imageUrl: {
-                type: "string",
-                example: "https://example.com/images/cbc-test.png",
-                description: "Medical test image URL"
-              },
-              price: {
-                type: "number",
-                example: 500
-              },
-              preparationInstructions: {
-                type: "string",
-                example: "No fasting required"
-              },
-              duration: {
-                type: "string",
-                example: "24 hours"
-              },
-              isActive: {
-                type: "boolean",
-                example: true
-              }
-            }
-          }
-        }
-      }
-    },
-
-    responses: {
-      201: { description: "Test created successfully" },
-      400: { description: "Validation error" },
-      401: { description: "Unauthorized" },
-      403: { description: "Admin access required" }
-    }
-  },
-
-  // GET ALL TESTS
-  get: {
-    tags: ["Admin Test Management"],
-    summary: "Get All Tests",
-    description: "Admin can view all medical tests including active and inactive tests",
-    security: [{ BearerAuth: [] }],
-
-    responses: {
-      200: {
-        description: "All tests fetched successfully",
-        content: {
-          "application/json": {
-            schema: {
-              type: "object",
-              properties: {
-                success: {
-                  type: "boolean",
-                  example: true
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["testName", "price", "duration"],
+                properties: {
+                  testName: {
+                    type: "string",
+                    example: "Complete Blood Count (CBC)",
+                  },
+                  description: {
+                    type: "string",
+                    example: "Blood test to check overall health",
+                  },
+                  imageUrl: {
+                    type: "string",
+                    example: "https://example.com/images/cbc-test.png",
+                    description: "Medical test image URL",
+                  },
+                  price: {
+                    type: "number",
+                    example: 500,
+                  },
+                  preparationInstructions: {
+                    type: "string",
+                    example: "No fasting required",
+                  },
+                  duration: {
+                    type: "string",
+                    example: "24 hours",
+                  },
+                  isActive: {
+                    type: "boolean",
+                    example: true,
+                  },
                 },
-                total: {
-                  type: "number",
-                  example: 2
-                },
-                data: {
-                  type: "array",
-                  items: {
-                    type: "object",
-                    properties: {
-                      _id: {
-                        type: "string",
-                        example: "672a12345678901234567890"
-                      },
-                      testName: {
-                        type: "string",
-                        example: "Complete Blood Count (CBC)"
-                      },
-                      description: {
-                        type: "string",
-                        example: "Blood test to check overall health"
-                      },
-                      imageUrl: {
-                        type: "string",
-                        example: "https://example.com/images/cbc-test.png"
-                      },
-                      price: {
-                        type: "number",
-                        example: 500
-                      },
-                      preparationInstructions: {
-                        type: "string",
-                        example: "No fasting required"
-                      },
-                      duration: {
-                        type: "string",
-                        example: "24 hours"
-                      },
-                      isActive: {
-                        type: "boolean",
-                        example: true
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+              },
+            },
+          },
+        },
+
+        responses: {
+          201: { description: "Test created successfully" },
+          400: { description: "Validation error" },
+          401: { description: "Unauthorized" },
+          403: { description: "Admin access required" },
+        },
       },
-      401: { description: "Token required" },
-      403: { description: "Admin access required" },
-      500: { description: "Internal server error" }
-    }
-  }
-},
 
-"/api/admin/tests/{id}": {
-  // GET SINGLE TEST
-  get: {
-    tags: ["Admin Test Management"],
-    summary: "Get Single Test",
-    description: "Admin can view test details by ID",
-    security: [{ BearerAuth: [] }],
+      // GET ALL TESTS
+      get: {
+        tags: ["Admin Test Management"],
+        summary: "Get All Tests",
+        description:
+          "Admin can view all medical tests including active and inactive tests",
+        security: [{ BearerAuth: [] }],
 
-    parameters: [
-      {
-        name: "id",
-        in: "path",
-        required: true,
-        schema: {
-          type: "string",
-          example: "672a12345678901234567890"
+        responses: {
+          200: {
+            description: "All tests fetched successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    total: {
+                      type: "number",
+                      example: 2,
+                    },
+                    data: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                        properties: {
+                          _id: {
+                            type: "string",
+                            example: "672a12345678901234567890",
+                          },
+                          testName: {
+                            type: "string",
+                            example: "Complete Blood Count (CBC)",
+                          },
+                          description: {
+                            type: "string",
+                            example: "Blood test to check overall health",
+                          },
+                          imageUrl: {
+                            type: "string",
+                            example: "https://example.com/images/cbc-test.png",
+                          },
+                          price: {
+                            type: "number",
+                            example: 500,
+                          },
+                          preparationInstructions: {
+                            type: "string",
+                            example: "No fasting required",
+                          },
+                          duration: {
+                            type: "string",
+                            example: "24 hours",
+                          },
+                          isActive: {
+                            type: "boolean",
+                            example: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          401: { description: "Token required" },
+          403: { description: "Admin access required" },
+          500: { description: "Internal server error" },
         },
-        description: "Test ID"
-      }
-    ],
-
-    responses: {
-      200: { description: "Test fetched successfully" },
-      400: { description: "Invalid test ID" },
-      401: { description: "Token required" },
-      403: { description: "Admin access required" },
-      404: { description: "Test not found" },
-      500: { description: "Internal server error" }
-    }
-  },
-
-  // UPDATE TEST
-  put: {
-    tags: ["Admin Test Management"],
-    summary: "Update Test",
-    description: "Admin can update existing test details",
-    security: [{ BearerAuth: [] }],
-
-    parameters: [
-      {
-        name: "id",
-        in: "path",
-        required: true,
-        schema: {
-          type: "string",
-          example: "672a12345678901234567890"
-        },
-        description: "Test ID"
-      }
-    ],
-
-    requestBody: {
-      required: true,
-      content: {
-        "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              testName: {
-                type: "string",
-                example: "Complete Blood Count"
-              },
-              description: {
-                type: "string",
-                example: "Updated blood test description"
-              },
-              imageUrl: {
-                type: "string",
-                example: "https://example.com/images/updated-cbc.png",
-                description: "Updated medical test image URL"
-              },
-              price: {
-                type: "number",
-                example: 600
-              },
-              preparationInstructions: {
-                type: "string",
-                example: "Fasting required for 8 hours"
-              },
-              duration: {
-                type: "string",
-                example: "12 hours"
-              },
-              isActive: {
-                type: "boolean",
-                example: true
-              }
-            }
-          }
-        }
-      }
+      },
     },
 
-    responses: {
-      200: { description: "Test updated successfully" },
-      400: { description: "Invalid test ID or update data" },
-      401: { description: "Token required" },
-      403: { description: "Admin access required" },
-      404: { description: "Test not found" },
-      500: { description: "Internal server error" }
-    }
-  },
+    "/api/admin/tests/{id}": {
+      // GET SINGLE TEST
+      get: {
+        tags: ["Admin Test Management"],
+        summary: "Get Single Test",
+        description: "Admin can view test details by ID",
+        security: [{ BearerAuth: [] }],
 
-  // DELETE TEST
-  delete: {
-    tags: ["Admin Test Management"],
-    summary: "Delete Test",
-    description: "Admin can delete a medical test",
-    security: [{ BearerAuth: [] }],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+              example: "672a12345678901234567890",
+            },
+            description: "Test ID",
+          },
+        ],
 
-    parameters: [
-      {
-        name: "id",
-        in: "path",
-        required: true,
-        schema: {
-          type: "string",
-          example: "672a12345678901234567890"
+        responses: {
+          200: { description: "Test fetched successfully" },
+          400: { description: "Invalid test ID" },
+          401: { description: "Token required" },
+          403: { description: "Admin access required" },
+          404: { description: "Test not found" },
+          500: { description: "Internal server error" },
         },
-        description: "Test ID"
-      }
-    ],
+      },
 
-    responses: {
-      200: { description: "Test deleted successfully" },
-      400: { description: "Invalid test ID" },
-      401: { description: "Token required" },
-      403: { description: "Admin access required" },
-      404: { description: "Test not found" },
-      500: { description: "Internal server error" }
-    }
-  }
-},
+      // UPDATE TEST
+      put: {
+        tags: ["Admin Test Management"],
+        summary: "Update Test",
+        description: "Admin can update existing test details",
+        security: [{ BearerAuth: [] }],
+
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+              example: "672a12345678901234567890",
+            },
+            description: "Test ID",
+          },
+        ],
+
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  testName: {
+                    type: "string",
+                    example: "Complete Blood Count",
+                  },
+                  description: {
+                    type: "string",
+                    example: "Updated blood test description",
+                  },
+                  imageUrl: {
+                    type: "string",
+                    example: "https://example.com/images/updated-cbc.png",
+                    description: "Updated medical test image URL",
+                  },
+                  price: {
+                    type: "number",
+                    example: 600,
+                  },
+                  preparationInstructions: {
+                    type: "string",
+                    example: "Fasting required for 8 hours",
+                  },
+                  duration: {
+                    type: "string",
+                    example: "12 hours",
+                  },
+                  isActive: {
+                    type: "boolean",
+                    example: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+
+        responses: {
+          200: { description: "Test updated successfully" },
+          400: { description: "Invalid test ID or update data" },
+          401: { description: "Token required" },
+          403: { description: "Admin access required" },
+          404: { description: "Test not found" },
+          500: { description: "Internal server error" },
+        },
+      },
+
+      // DELETE TEST
+      delete: {
+        tags: ["Admin Test Management"],
+        summary: "Delete Test",
+        description: "Admin can delete a medical test",
+        security: [{ BearerAuth: [] }],
+
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+              example: "672a12345678901234567890",
+            },
+            description: "Test ID",
+          },
+        ],
+
+        responses: {
+          200: { description: "Test deleted successfully" },
+          400: { description: "Invalid test ID" },
+          401: { description: "Token required" },
+          403: { description: "Admin access required" },
+          404: { description: "Test not found" },
+          500: { description: "Internal server error" },
+        },
+      },
+    },
 
     // =========================================
     // CUSTOMER TEST MANAGEMENT APIs
@@ -1165,200 +1165,201 @@ const swaggerSpec = {
 
     // ================= CUSTOMER TIME SLOT APIs =================
 
-"/api/customer/time-slots": {
-  get: {
-    tags: ["Customer Time Slot"],
-    summary: "Get Available Time Slots",
-    operationId: "getAvailableTimeSlots",
-    description: "Get all active time slots with available seats for a selected date.",
-    security: [{ BearerAuth: [] }],
+    "/api/customer/time-slots": {
+      get: {
+        tags: ["Customer Time Slot"],
+        summary: "Get Available Time Slots",
+        operationId: "getAvailableTimeSlots",
+        description:
+          "Get all active time slots with available seats for a selected date.",
+        security: [{ BearerAuth: [] }],
 
-    parameters: [
-      {
-        in: "query",
-        name: "date",
-        required: true,
-        description: "Booking date in YYYY-MM-DD format",
-        schema: {
-          type: "string",
-          example: "2026-11-15"
-        }
-      }
-    ],
-
-    responses: {
-      200: {
-        description: "Available time slots fetched successfully",
-        content: {
-          "application/json": {
+        parameters: [
+          {
+            in: "query",
+            name: "date",
+            required: true,
+            description: "Booking date in YYYY-MM-DD format",
             schema: {
-              type: "object",
-              properties: {
-                success: {
-                  type: "boolean",
-                  example: true
-                },
-                total: {
-                  type: "integer",
-                  example: 2
-                },
-                data: {
-                  type: "array",
-                  items: {
-                    type: "object",
-                    properties: {
-                      _id: {
-                        type: "string",
-                        example: "672abc123456789012345678"
-                      },
-                      date: {
-                        type: "string",
-                        example: "2026-11-15"
-                      },
-                      startTime: {
-                        type: "string",
-                        example: "10:00"
-                      },
-                      endTime: {
-                        type: "string",
-                        example: "10:30"
-                      },
-                      capacity: {
-                        type: "integer",
-                        example: 5
-                      },
-                      bookedCount: {
-                        type: "integer",
-                        example: 2
-                      },
-                      availableSeats: {
-                        type: "integer",
-                        example: 3
-                      },
-                      isActive: {
-                        type: "boolean",
-                        example: true
-                      },
-                      isAvailable: {
-                        type: "boolean",
-                        example: true
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
+              type: "string",
+              example: "2026-11-15",
+            },
+          },
+        ],
 
-      400: {
-        description: "Invalid or missing date"
-      },
-      401: {
-        description: "Unauthorized"
-      },
-      403: {
-        description: "Forbidden - Customer access only"
-      }
-    }
-  }
-},
-
-"/api/customer/time-slots/{id}": {
-  get: {
-    tags: ["Customer Time Slot"],
-    summary: "Get Available Time Slot By ID",
-    operationId: "getAvailableTimeSlotById",
-    description: "Get details of a particular available time slot.",
-    security: [{ BearerAuth: [] }],
-
-    parameters: [
-      {
-        in: "path",
-        name: "id",
-        required: true,
-        description: "MongoDB Time Slot ID",
-        schema: {
-          type: "string",
-          example: "672abc123456789012345678"
-        }
-      }
-    ],
-
-    responses: {
-      200: {
-        description: "Time slot fetched successfully",
-        content: {
-          "application/json": {
-            schema: {
-              type: "object",
-              properties: {
-                success: {
-                  type: "boolean",
-                  example: true
-                },
-                data: {
+        responses: {
+          200: {
+            description: "Available time slots fetched successfully",
+            content: {
+              "application/json": {
+                schema: {
                   type: "object",
                   properties: {
-                    _id: {
-                      type: "string"
-                    },
-                    date: {
-                      type: "string",
-                      example: "2026-11-15"
-                    },
-                    startTime: {
-                      type: "string",
-                      example: "10:00"
-                    },
-                    endTime: {
-                      type: "string",
-                      example: "10:30"
-                    },
-                    capacity: {
-                      type: "integer",
-                      example: 5
-                    },
-                    bookedCount: {
-                      type: "integer",
-                      example: 2
-                    },
-                    availableSeats: {
-                      type: "integer",
-                      example: 3
-                    },
-                    isActive: {
+                    success: {
                       type: "boolean",
-                      example: true
+                      example: true,
                     },
-                    isAvailable: {
-                      type: "boolean",
-                      example: true
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
+                    total: {
+                      type: "integer",
+                      example: 2,
+                    },
+                    data: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                        properties: {
+                          _id: {
+                            type: "string",
+                            example: "672abc123456789012345678",
+                          },
+                          date: {
+                            type: "string",
+                            example: "2026-11-15",
+                          },
+                          startTime: {
+                            type: "string",
+                            example: "10:00",
+                          },
+                          endTime: {
+                            type: "string",
+                            example: "10:30",
+                          },
+                          capacity: {
+                            type: "integer",
+                            example: 5,
+                          },
+                          bookedCount: {
+                            type: "integer",
+                            example: 2,
+                          },
+                          availableSeats: {
+                            type: "integer",
+                            example: 3,
+                          },
+                          isActive: {
+                            type: "boolean",
+                            example: true,
+                          },
+                          isAvailable: {
+                            type: "boolean",
+                            example: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
 
-      400: {
-        description: "Invalid time slot ID"
+          400: {
+            description: "Invalid or missing date",
+          },
+          401: {
+            description: "Unauthorized",
+          },
+          403: {
+            description: "Forbidden - Customer access only",
+          },
+        },
       },
-      401: {
-        description: "Unauthorized"
+    },
+
+    "/api/customer/time-slots/{id}": {
+      get: {
+        tags: ["Customer Time Slot"],
+        summary: "Get Available Time Slot By ID",
+        operationId: "getAvailableTimeSlotById",
+        description: "Get details of a particular available time slot.",
+        security: [{ BearerAuth: [] }],
+
+        parameters: [
+          {
+            in: "path",
+            name: "id",
+            required: true,
+            description: "MongoDB Time Slot ID",
+            schema: {
+              type: "string",
+              example: "672abc123456789012345678",
+            },
+          },
+        ],
+
+        responses: {
+          200: {
+            description: "Time slot fetched successfully",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: {
+                      type: "boolean",
+                      example: true,
+                    },
+                    data: {
+                      type: "object",
+                      properties: {
+                        _id: {
+                          type: "string",
+                        },
+                        date: {
+                          type: "string",
+                          example: "2026-11-15",
+                        },
+                        startTime: {
+                          type: "string",
+                          example: "10:00",
+                        },
+                        endTime: {
+                          type: "string",
+                          example: "10:30",
+                        },
+                        capacity: {
+                          type: "integer",
+                          example: 5,
+                        },
+                        bookedCount: {
+                          type: "integer",
+                          example: 2,
+                        },
+                        availableSeats: {
+                          type: "integer",
+                          example: 3,
+                        },
+                        isActive: {
+                          type: "boolean",
+                          example: true,
+                        },
+                        isAvailable: {
+                          type: "boolean",
+                          example: true,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+
+          400: {
+            description: "Invalid time slot ID",
+          },
+          401: {
+            description: "Unauthorized",
+          },
+          403: {
+            description: "Forbidden - Customer access only",
+          },
+          404: {
+            description: "Time slot not found or unavailable",
+          },
+        },
       },
-      403: {
-        description: "Forbidden - Customer access only"
-      },
-      404: {
-        description: "Time slot not found or unavailable"
-      }
-    }
-  }
-}
+    },
   },
 };
 
