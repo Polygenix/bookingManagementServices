@@ -27,7 +27,7 @@ const swaggerSpec = {
     { name: "Customer Booking" },
     { name: "Admin Booking" },
     { name: "Admin Test Management" },
-    // { name: "Customer Test Management" },
+    { name: "Customer Test Management" },
     { name: "Common APIs" },
   ],
 
@@ -672,21 +672,77 @@ const swaggerSpec = {
     // CUSTOMER TEST MANAGEMENT APIs
     // =========================================
 
-    // "/api/customer/tests": {
-    //   get: {
-    //     tags: ["Customer Test Management"],
-    //     summary: "Get All Available Tests",
-    //     description: "Customer can view all active medical tests",
-    //     security: [{ BearerAuth: [] }],
+    
+"/api/customer/tests": {
+  get: {
+    tags: ["Customer Test"],
+    summary: "Get All Active Tests",
+    operationId: "getCustomerTests",
+    description: "Get all active tests for logged-in customer",
 
-    //     responses: {
-    //       200: { description: "Available tests fetched successfully" },
-    //       401: { description: "Token required" },
-    //       403: { description: "Customer access required" },
-    //       500: { description: "Internal server error" },
-    //     },
-    //   },
-    // },
+    security: [{ BearerAuth: [] }],
+
+    responses: {
+      200: {
+        description: "Active tests fetched successfully"
+      },
+      401: {
+        description: "Unauthorized - Token required"
+      },
+      403: {
+        description: "Forbidden - Customer access required"
+      },
+      500: {
+        description: "Internal server error"
+      }
+    }
+  }
+},
+
+"/api/customer/tests/{id}": {
+  get: {
+    tags: ["Customer Test"],
+    summary: "Get Test Details",
+    operationId: "getCustomerTestById",
+    description: "Get single active test details by ID",
+
+    security: [{ BearerAuth: [] }],
+
+    parameters: [
+      {
+        in: "path",
+        name: "id",
+        required: true,
+        schema: {
+          type: "string"
+        },
+        description: "Test MongoDB ID"
+      }
+    ],
+
+    responses: {
+      200: {
+        description: "Test details fetched successfully"
+      },
+      400: {
+        description: "Invalid test ID"
+      },
+      401: {
+        description: "Unauthorized - Token required"
+      },
+      403: {
+        description: "Forbidden - Customer access required"
+      },
+      404: {
+        description: "Test not found or inactive"
+      },
+      500: {
+        description: "Internal server error"
+      }
+    }
+  }
+},
+
 
     // =========================================
     // COMMON FILE UPLOAD API

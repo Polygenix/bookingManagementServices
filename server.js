@@ -11,6 +11,7 @@ const adminRoutes = require("./routes/adminRoutes");
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./docs/swagger");
 const testRoutes = require("./routes/testRoutes");
+const customerTestRoutes = require("./routes/customerTestRoutes");
 
 const uploadRoutes = require("./routes/uploadRoutes");
 const path = require("path");
@@ -25,6 +26,7 @@ app.use("/api/common/upload", uploadRoutes);
 // Auth APIs
 app.use("/api/auth", authRoutes);
 app.use("/api/admin/tests", testRoutes);
+app.use("/api/customer/tests", customerTestRoutes);
 // Swagger
 app.use(
   "/BookingManagementServices",
