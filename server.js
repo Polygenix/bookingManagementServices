@@ -12,6 +12,8 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./docs/swagger");
 const testRoutes = require("./routes/testRoutes");
 const customerTestRoutes = require("./routes/customerTestRoutes");
+const paymentRoutes = require("./routes/paymentRoutes");
+
 
 const uploadRoutes = require("./routes/uploadRoutes");
 const path = require("path");
@@ -22,6 +24,7 @@ app.use(cors());
 app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/common/upload", uploadRoutes);
+app.use("/api/customer/payments", paymentRoutes);
 
 // Auth APIs
 app.use("/api/auth", authRoutes);

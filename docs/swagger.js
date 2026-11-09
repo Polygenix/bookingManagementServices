@@ -27,7 +27,7 @@ const swaggerSpec = {
     { name: "Customer Booking" },
     { name: "Admin Booking" },
     { name: "Admin Test Management" },
-   
+    { name: "Payments" },
     { name: "Common APIs" },
   ],
 
@@ -673,75 +673,75 @@ const swaggerSpec = {
     // =========================================
 
     
-"/api/customer/tests": {
-  get: {
-    tags: ["Customer Test"],
-    summary: "Get All Active Tests",
-    operationId: "getCustomerTests",
-    description: "Get all active tests for logged-in customer",
+    "/api/customer/tests": {
+      get: {
+        tags: ["Customer Test"],
+        summary: "Get All Active Tests",
+        operationId: "getCustomerTests",
+        description: "Get all active tests for logged-in customer",
 
-    security: [{ BearerAuth: [] }],
+        security: [{ BearerAuth: [] }],
 
-    responses: {
-      200: {
-        description: "Active tests fetched successfully"
-      },
-      401: {
-        description: "Unauthorized - Token required"
-      },
-      403: {
-        description: "Forbidden - Customer access required"
-      },
-      500: {
-        description: "Internal server error"
+        responses: {
+          200: {
+            description: "Active tests fetched successfully"
+          },
+          401: {
+            description: "Unauthorized - Token required"
+          },
+          403: {
+            description: "Forbidden - Customer access required"
+          },
+          500: {
+            description: "Internal server error"
+          }
+        }
       }
-    }
-  }
-},
+    },
 
-"/api/customer/tests/{id}": {
-  get: {
-    tags: ["Customer Test"],
-    summary: "Get Test Details",
-    operationId: "getCustomerTestById",
-    description: "Get single active test details by ID",
+    "/api/customer/tests/{id}": {
+      get: {
+        tags: ["Customer Test"],
+        summary: "Get Test Details",
+        operationId: "getCustomerTestById",
+        description: "Get single active test details by ID",
 
-    security: [{ BearerAuth: [] }],
+        security: [{ BearerAuth: [] }],
 
-    parameters: [
-      {
-        in: "path",
-        name: "id",
-        required: true,
-        schema: {
-          type: "string"
-        },
-        description: "Test MongoDB ID"
+        parameters: [
+          {
+            in: "path",
+            name: "id",
+            required: true,
+            schema: {
+              type: "string"
+            },
+            description: "Test MongoDB ID"
+          }
+        ],
+
+        responses: {
+          200: {
+            description: "Test details fetched successfully"
+          },
+          400: {
+            description: "Invalid test ID"
+          },
+          401: {
+            description: "Unauthorized - Token required"
+          },
+          403: {
+            description: "Forbidden - Customer access required"
+          },
+          404: {
+            description: "Test not found or inactive"
+          },
+          500: {
+            description: "Internal server error"
+          }
+        }
       }
-    ],
-
-    responses: {
-      200: {
-        description: "Test details fetched successfully"
-      },
-      400: {
-        description: "Invalid test ID"
-      },
-      401: {
-        description: "Unauthorized - Token required"
-      },
-      403: {
-        description: "Forbidden - Customer access required"
-      },
-      404: {
-        description: "Test not found or inactive"
-      },
-      500: {
-        description: "Internal server error"
-      }
-    }
-  }
-},
+    },
 
 
     // =========================================
@@ -792,6 +792,169 @@ const swaggerSpec = {
         },
       },
     },
+
+    // =========================================
+    // PAYMENT APIs
+    // =========================================
+
+"/api/customer/payments/create-order": {
+  post: {
+    tags: ["Customer Payment"],
+    summary: "Create Razorpay Order",
+    operationId: "createPaymentOrder",
+    description: "Create a Razorpay order for a customer booking",
+    security: [{ BearerAuth: [] }],
+
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            required: ["bookingId"],
+            properties: {
+              bookingId: {
+                type: "string",
+                example: "672abc123456789012345678"
+              }
+            }
+          }
+        }
+      }
+    },
+
+    responses: {
+      201: {
+        description: "Razorpay order created successfully"
+      },
+      400: {
+        description: "Invalid booking ID or booking amount"
+      },
+      401: {
+        description: "Unauthorized - Token required"
+      },
+      403: {
+        description: "Customer access required"
+      },
+      404: {
+        description: "Booking not found"
+      },
+      409: {
+        description: "Booking already paid"
+      },
+      500: {
+        description: "Internal server error"
+      }
+    }
+  }
+},
+
+"/api/customer/payments/verify": {
+  post: {
+    tags: ["Customer Payment"],
+    summary: "Verify Payment",
+    operationId: "verifyPayment",
+    description: "Verify Razorpay payment signature and captured payment",
+    security: [{ BearerAuth: [] }],
+
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            required: [
+              "razorpay_order_id",
+              "razorpay_payment_id",
+              "razorpay_signature"
+            ],
+            properties: {
+              razorpay_order_id: {
+                type: "string",
+                example: "order_example123"
+              },
+              razorpay_payment_id: {
+                type: "string",
+                example: "pay_example123"
+              },
+              razorpay_signature: {
+                type: "string",
+                example: "signature_example123"
+              }
+            }
+          }
+        }
+      }
+    },
+
+    responses: {
+      200: {
+        description: "Payment verified successfully"
+      },
+      400: {
+        description: "Invalid signature or payment not captured"
+      },
+      401: {
+        description: "Unauthorized - Token required"
+      },
+      403: {
+        description: "Customer access required"
+      },
+      404: {
+        description: "Payment order not found"
+      },
+      500: {
+        description: "Internal server error"
+      }
+    }
+  }
+},
+
+"/api/customer/payments/{id}": {
+  get: {
+    tags: ["Customer Payment"],
+    summary: "Get Payment Details",
+    operationId: "getPaymentDetails",
+    description: "Get payment details by payment ID",
+    security: [{ BearerAuth: [] }],
+
+    parameters: [
+      {
+        in: "path",
+        name: "id",
+        required: true,
+        schema: {
+          type: "string"
+        },
+        description: "MongoDB Payment ID",
+        example: "672abc123456789012345678"
+      }
+    ],
+
+    responses: {
+      200: {
+        description: "Payment details fetched successfully"
+      },
+      400: {
+        description: "Invalid payment ID"
+      },
+      401: {
+        description: "Unauthorized - Token required"
+      },
+      403: {
+        description: "Customer access required"
+      },
+      404: {
+        description: "Payment not found"
+      },
+      500: {
+        description: "Internal server error"
+      }
+    }
+  }
+}
+
+
   },
 };
 
