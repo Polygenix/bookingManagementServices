@@ -671,7 +671,6 @@ const swaggerSpec = {
     // CUSTOMER TEST MANAGEMENT APIs
     // =========================================
 
-    
     "/api/customer/tests": {
       get: {
         tags: ["Customer Test"],
@@ -683,19 +682,19 @@ const swaggerSpec = {
 
         responses: {
           200: {
-            description: "Active tests fetched successfully"
+            description: "Active tests fetched successfully",
           },
           401: {
-            description: "Unauthorized - Token required"
+            description: "Unauthorized - Token required",
           },
           403: {
-            description: "Forbidden - Customer access required"
+            description: "Forbidden - Customer access required",
           },
           500: {
-            description: "Internal server error"
-          }
-        }
-      }
+            description: "Internal server error",
+          },
+        },
+      },
     },
 
     "/api/customer/tests/{id}": {
@@ -713,35 +712,34 @@ const swaggerSpec = {
             name: "id",
             required: true,
             schema: {
-              type: "string"
+              type: "string",
             },
-            description: "Test MongoDB ID"
-          }
+            description: "Test MongoDB ID",
+          },
         ],
 
         responses: {
           200: {
-            description: "Test details fetched successfully"
+            description: "Test details fetched successfully",
           },
           400: {
-            description: "Invalid test ID"
+            description: "Invalid test ID",
           },
           401: {
-            description: "Unauthorized - Token required"
+            description: "Unauthorized - Token required",
           },
           403: {
-            description: "Forbidden - Customer access required"
+            description: "Forbidden - Customer access required",
           },
           404: {
-            description: "Test not found or inactive"
+            description: "Test not found or inactive",
           },
           500: {
-            description: "Internal server error"
-          }
-        }
-      }
+            description: "Internal server error",
+          },
+        },
+      },
     },
-
 
     // =========================================
     // COMMON FILE UPLOAD API
@@ -814,38 +812,38 @@ const swaggerSpec = {
                 properties: {
                   bookingId: {
                     type: "string",
-                    example: "672abc123456789012345678"
-                  }
-                }
-              }
-            }
-          }
+                    example: "672abc123456789012345678",
+                  },
+                },
+              },
+            },
+          },
         },
 
         responses: {
           201: {
-            description: "Razorpay order created successfully"
+            description: "Razorpay order created successfully",
           },
           400: {
-            description: "Invalid booking ID or booking amount"
+            description: "Invalid booking ID or booking amount",
           },
           401: {
-            description: "Unauthorized - Token required"
+            description: "Unauthorized - Token required",
           },
           403: {
-            description: "Customer access required"
+            description: "Customer access required",
           },
           404: {
-            description: "Booking not found"
+            description: "Booking not found",
           },
           409: {
-            description: "Booking already paid"
+            description: "Booking already paid",
           },
           500: {
-            description: "Internal server error"
-          }
-        }
-      }
+            description: "Internal server error",
+          },
+        },
+      },
     },
 
     "/api/customer/payments/verify": {
@@ -865,48 +863,48 @@ const swaggerSpec = {
                 required: [
                   "razorpay_order_id",
                   "razorpay_payment_id",
-                  "razorpay_signature"
+                  "razorpay_signature",
                 ],
                 properties: {
                   razorpay_order_id: {
                     type: "string",
-                    example: "order_example123"
+                    example: "order_example123",
                   },
                   razorpay_payment_id: {
                     type: "string",
-                    example: "pay_example123"
+                    example: "pay_example123",
                   },
                   razorpay_signature: {
                     type: "string",
-                    example: "signature_example123"
-                  }
-                }
-              }
-            }
-          }
+                    example: "signature_example123",
+                  },
+                },
+              },
+            },
+          },
         },
 
         responses: {
           200: {
-            description: "Payment verified successfully"
+            description: "Payment verified successfully",
           },
           400: {
-            description: "Invalid signature or payment not captured"
+            description: "Invalid signature or payment not captured",
           },
           401: {
-            description: "Unauthorized - Token required"
+            description: "Unauthorized - Token required",
           },
           403: {
-            description: "Customer access required"
+            description: "Customer access required",
           },
           404: {
-            description: "Payment order not found"
+            description: "Payment order not found",
           },
           500: {
-            description: "Internal server error"
-          }
-        }
-      }
+            description: "Internal server error",
+          },
+        },
+      },
     },
 
     "/api/customer/payments/{id}": {
@@ -923,165 +921,366 @@ const swaggerSpec = {
             name: "id",
             required: true,
             schema: {
-              type: "string"
+              type: "string",
             },
             description: "MongoDB Payment ID",
-            example: "672abc123456789012345678"
-          }
+            example: "672abc123456789012345678",
+          },
         ],
 
         responses: {
           200: {
-            description: "Payment details fetched successfully"
+            description: "Payment details fetched successfully",
           },
           400: {
-            description: "Invalid payment ID"
+            description: "Invalid payment ID",
           },
           401: {
-            description: "Unauthorized - Token required"
+            description: "Unauthorized - Token required",
           },
           403: {
-            description: "Customer access required"
+            description: "Customer access required",
           },
           404: {
-            description: "Payment not found"
+            description: "Payment not found",
           },
           500: {
-            description: "Internal server error"
-          }
-        }
-      }
+            description: "Internal server error",
+          },
+        },
+      },
     },
 
     // =========================================
     // TIME SLOT APIs
     // =========================================
-      
 
-"/api/admin/time-slots": {
-  post: {
-    tags: ["Admin Time Slot"],
-    summary: "Create Time Slot",
-    operationId: "createTimeSlot",
+    "/api/admin/time-slots": {
+      post: {
+        tags: ["Admin Time Slot"],
+        summary: "Create Time Slot",
+        operationId: "createTimeSlot",
+        security: [{ BearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["date", "startTime", "endTime", "capacity"],
+                properties: {
+                  date: { type: "string", example: "2026-11-15" },
+                  startTime: { type: "string", example: "10:00" },
+                  endTime: { type: "string", example: "10:30" },
+                  capacity: { type: "integer", example: 5 },
+                  isActive: { type: "boolean", example: true },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          201: { description: "Time slot created successfully" },
+          400: { description: "Invalid input" },
+          401: { description: "Unauthorized" },
+          403: { description: "Admin access required" },
+          409: { description: "Time slot already exists" },
+        },
+      },
+      get: {
+        tags: ["Admin Time Slot"],
+        summary: "Get All Time Slots",
+        operationId: "getAllTimeSlots",
+        security: [{ BearerAuth: [] }],
+        parameters: [
+          {
+            in: "query",
+            name: "date",
+            required: false,
+            schema: { type: "string", example: "2026-11-15" },
+          },
+        ],
+        responses: {
+          200: { description: "Time slots fetched successfully" },
+          401: { description: "Unauthorized" },
+          403: { description: "Admin access required" },
+        },
+      },
+    },
+
+    "/api/admin/time-slots/{id}": {
+      get: {
+        tags: ["Admin Time Slot"],
+        summary: "Get Time Slot By ID",
+        operationId: "getTimeSlotById",
+        security: [{ BearerAuth: [] }],
+        parameters: [
+          {
+            in: "path",
+            name: "id",
+            required: true,
+            schema: { type: "string" },
+          },
+        ],
+        responses: {
+          200: { description: "Time slot details fetched successfully" },
+          400: { description: "Invalid time slot ID" },
+          404: { description: "Time slot not found" },
+        },
+      },
+      put: {
+        tags: ["Admin Time Slot"],
+        summary: "Update Time Slot",
+        operationId: "updateTimeSlot",
+        security: [{ BearerAuth: [] }],
+        parameters: [
+          {
+            in: "path",
+            name: "id",
+            required: true,
+            schema: { type: "string" },
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  date: { type: "string", example: "2026-11-15" },
+                  startTime: { type: "string", example: "10:30" },
+                  endTime: { type: "string", example: "11:00" },
+                  capacity: { type: "integer", example: 6 },
+                  isActive: { type: "boolean", example: true },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          200: { description: "Time slot updated successfully" },
+          400: { description: "Invalid input or capacity" },
+          404: { description: "Time slot not found" },
+        },
+      },
+      delete: {
+        tags: ["Admin Time Slot"],
+        summary: "Delete Time Slot",
+        operationId: "deleteTimeSlot",
+        security: [{ BearerAuth: [] }],
+        parameters: [
+          {
+            in: "path",
+            name: "id",
+            required: true,
+            schema: { type: "string" },
+          },
+        ],
+        responses: {
+          200: { description: "Time slot deleted successfully" },
+          400: { description: "Slot already has bookings" },
+          404: { description: "Time slot not found" },
+        },
+      },
+    },
+
+    // ================= CUSTOMER TIME SLOT APIs =================
+
+"/api/customer/time-slots": {
+  get: {
+    tags: ["Customer Time Slot"],
+    summary: "Get Available Time Slots",
+    operationId: "getAvailableTimeSlots",
+    description: "Get all active time slots with available seats for a selected date.",
     security: [{ BearerAuth: [] }],
-    requestBody: {
-      required: true,
-      content: {
-        "application/json": {
-          schema: {
-            type: "object",
-            required: ["date", "startTime", "endTime", "capacity"],
-            properties: {
-              date: { type: "string", example: "2026-11-15" },
-              startTime: { type: "string", example: "10:00" },
-              endTime: { type: "string", example: "10:30" },
-              capacity: { type: "integer", example: 5 },
-              isActive: { type: "boolean", example: true }
+
+    parameters: [
+      {
+        in: "query",
+        name: "date",
+        required: true,
+        description: "Booking date in YYYY-MM-DD format",
+        schema: {
+          type: "string",
+          example: "2026-11-15"
+        }
+      }
+    ],
+
+    responses: {
+      200: {
+        description: "Available time slots fetched successfully",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                success: {
+                  type: "boolean",
+                  example: true
+                },
+                total: {
+                  type: "integer",
+                  example: 2
+                },
+                data: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      _id: {
+                        type: "string",
+                        example: "672abc123456789012345678"
+                      },
+                      date: {
+                        type: "string",
+                        example: "2026-11-15"
+                      },
+                      startTime: {
+                        type: "string",
+                        example: "10:00"
+                      },
+                      endTime: {
+                        type: "string",
+                        example: "10:30"
+                      },
+                      capacity: {
+                        type: "integer",
+                        example: 5
+                      },
+                      bookedCount: {
+                        type: "integer",
+                        example: 2
+                      },
+                      availableSeats: {
+                        type: "integer",
+                        example: 3
+                      },
+                      isActive: {
+                        type: "boolean",
+                        example: true
+                      },
+                      isAvailable: {
+                        type: "boolean",
+                        example: true
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
         }
+      },
+
+      400: {
+        description: "Invalid or missing date"
+      },
+      401: {
+        description: "Unauthorized"
+      },
+      403: {
+        description: "Forbidden - Customer access only"
       }
-    },
-    responses: {
-      201: { description: "Time slot created successfully" },
-      400: { description: "Invalid input" },
-      401: { description: "Unauthorized" },
-      403: { description: "Admin access required" },
-      409: { description: "Time slot already exists" }
-    }
-  },
-  get: {
-    tags: ["Admin Time Slot"],
-    summary: "Get All Time Slots",
-    operationId: "getAllTimeSlots",
-    security: [{ BearerAuth: [] }],
-    parameters: [{
-      in: "query",
-      name: "date",
-      required: false,
-      schema: { type: "string", example: "2026-11-15" }
-    }],
-    responses: {
-      200: { description: "Time slots fetched successfully" },
-      401: { description: "Unauthorized" },
-      403: { description: "Admin access required" }
     }
   }
 },
 
-"/api/admin/time-slots/{id}": {
+"/api/customer/time-slots/{id}": {
   get: {
-    tags: ["Admin Time Slot"],
-    summary: "Get Time Slot By ID",
-    operationId: "getTimeSlotById",
+    tags: ["Customer Time Slot"],
+    summary: "Get Available Time Slot By ID",
+    operationId: "getAvailableTimeSlotById",
+    description: "Get details of a particular available time slot.",
     security: [{ BearerAuth: [] }],
-    parameters: [{
-      in: "path",
-      name: "id",
-      required: true,
-      schema: { type: "string" }
-    }],
+
+    parameters: [
+      {
+        in: "path",
+        name: "id",
+        required: true,
+        description: "MongoDB Time Slot ID",
+        schema: {
+          type: "string",
+          example: "672abc123456789012345678"
+        }
+      }
+    ],
+
     responses: {
-      200: { description: "Time slot details fetched successfully" },
-      400: { description: "Invalid time slot ID" },
-      404: { description: "Time slot not found" }
-    }
-  },
-  put: {
-    tags: ["Admin Time Slot"],
-    summary: "Update Time Slot",
-    operationId: "updateTimeSlot",
-    security: [{ BearerAuth: [] }],
-    parameters: [{
-      in: "path",
-      name: "id",
-      required: true,
-      schema: { type: "string" }
-    }],
-    requestBody: {
-      required: true,
-      content: {
-        "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              date: { type: "string", example: "2026-11-15" },
-              startTime: { type: "string", example: "10:30" },
-              endTime: { type: "string", example: "11:00" },
-              capacity: { type: "integer", example: 6 },
-              isActive: { type: "boolean", example: true }
+      200: {
+        description: "Time slot fetched successfully",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                success: {
+                  type: "boolean",
+                  example: true
+                },
+                data: {
+                  type: "object",
+                  properties: {
+                    _id: {
+                      type: "string"
+                    },
+                    date: {
+                      type: "string",
+                      example: "2026-11-15"
+                    },
+                    startTime: {
+                      type: "string",
+                      example: "10:00"
+                    },
+                    endTime: {
+                      type: "string",
+                      example: "10:30"
+                    },
+                    capacity: {
+                      type: "integer",
+                      example: 5
+                    },
+                    bookedCount: {
+                      type: "integer",
+                      example: 2
+                    },
+                    availableSeats: {
+                      type: "integer",
+                      example: 3
+                    },
+                    isActive: {
+                      type: "boolean",
+                      example: true
+                    },
+                    isAvailable: {
+                      type: "boolean",
+                      example: true
+                    }
+                  }
+                }
+              }
             }
           }
         }
+      },
+
+      400: {
+        description: "Invalid time slot ID"
+      },
+      401: {
+        description: "Unauthorized"
+      },
+      403: {
+        description: "Forbidden - Customer access only"
+      },
+      404: {
+        description: "Time slot not found or unavailable"
       }
-    },
-    responses: {
-      200: { description: "Time slot updated successfully" },
-      400: { description: "Invalid input or capacity" },
-      404: { description: "Time slot not found" }
-    }
-  },
-  delete: {
-    tags: ["Admin Time Slot"],
-    summary: "Delete Time Slot",
-    operationId: "deleteTimeSlot",
-    security: [{ BearerAuth: [] }],
-    parameters: [{
-      in: "path",
-      name: "id",
-      required: true,
-      schema: { type: "string" }
-    }],
-    responses: {
-      200: { description: "Time slot deleted successfully" },
-      400: { description: "Slot already has bookings" },
-      404: { description: "Time slot not found" }
     }
   }
 }
-
-
-
   },
 };
 

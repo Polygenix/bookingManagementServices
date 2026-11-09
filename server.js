@@ -14,6 +14,8 @@ const testRoutes = require("./routes/testRoutes");
 const customerTestRoutes = require("./routes/customerTestRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const timeSlotRoutes = require("./routes/timeSlotRoutes");
+const customerTimeSlotRoutes = require("./routes/customerTimeSlotRoutes");
+
 
 
 const uploadRoutes = require("./routes/uploadRoutes");
@@ -27,6 +29,10 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/common/upload", uploadRoutes);
 app.use("/api/customer/payments", paymentRoutes);
 app.use("/api/admin/time-slots", timeSlotRoutes);
+app.use(
+  "/api/customer/time-slots",
+  customerTimeSlotRoutes
+);
 
 // Auth APIs
 app.use("/api/auth", authRoutes);
