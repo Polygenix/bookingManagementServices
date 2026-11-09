@@ -1,6 +1,6 @@
 
 const mongoose = require("mongoose");
-const adminRepository = require("../repositories/adminRepository");
+const testRepository = require("../repositories/testRepository");
 
 // Create Test
 const createTest = async (data) => {
@@ -31,7 +31,7 @@ const createTest = async (data) => {
     throw error;
   }
 
-  return await adminRepository.createTest({
+  return await testRepository.createTest({
     testName,
     description,
     imageUrl,
@@ -44,7 +44,7 @@ const createTest = async (data) => {
 
 // Get All Tests
 const getAllTests = async () => {
-  return await adminRepository.getAllTests();
+  return await testRepository.getAllTests();
 };
 
 
@@ -56,7 +56,7 @@ const getTestById = async (id) => {
     throw error;
   }
 
-  const test = await adminRepository.getTestById(id);
+  const test = await testRepository.getTestById(id);
 
   if (!test) {
     const error = new Error("Test not found");
@@ -112,7 +112,7 @@ const updateTest = async (id, data) => {
     updateData.price = Number(updateData.price);
   }
 
-  const test = await adminRepository.updateTest(id, updateData);
+  const test = await testRepository.updateTest(id, updateData);
 
   if (!test) {
     const error = new Error("Test not found");
@@ -131,7 +131,7 @@ const deleteTest = async (id) => {
     throw error;
   }
 
-  const test = await adminRepository.deleteTest(id);
+  const test = await testRepository.deleteTest(id);
 
   if (!test) {
     const error = new Error("Test not found");

@@ -1,7 +1,9 @@
+
 const mongoose = require("mongoose");
 
 const bookingRepository = require("../repositories/bookingRepository");
 const TimeSlot = require("../models/TimeSlot");
+const Address = require("../models/Address");
 
 const throwError = (message, statusCode) => {
   const error = new Error(message);
@@ -20,131 +22,123 @@ const createBooking = async (customerId, data) => {
     email,
     bookingDate,
     timeSlotId,
-    notes
+    addressId,
+    notes,
   } = data;
 
-  // Required fields validation
   if (
     !patientName ||
     !testName ||
-    age === undefined ||
+    !age ||
     !gender ||
     !phone ||
     !email ||
     !bookingDate ||
-    !timeSlotId
+    !timeSlotId ||
+    !addressId
   ) {
     throwError("All required booking fields must be provided", 400);
   }
 
-  // Age validation
-  if (
-    !Number.isInteger(Number(age)) ||
-    Number(age) < 1 ||
-    Number(age) > 120
-  ) {
+  if (!Number.isInteger(Number(age)) || age < 1 || age > 120) {
     throwError("Age must be between 1 and 120", 400);
   }
 
-  // Email validation
-  const normalizedEmail = email.trim().toLowerCase();
-
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-  if (!emailRegex.test(normalizedEmail)) {
-    throwError("Invalid email address", 400);
-  }
-
-  // Gender validation
-  const normalizedGender =
-    gender.trim().charAt(0).toUpperCase() +
-    gender.trim().slice(1).toLowerCase();
-
-  if (!["Male", "Female", "Other"].includes(normalizedGender)) {
+  if (!["Male", "Female", "Other"].includes(gender)) {
     throwError("Invalid gender", 400);
   }
 
-  // Date validation
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(bookingDate)) {
-    throwError("Booking date must be YYYY-MM-DD", 400);
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    throwError("Invalid email address", 400);
   }
 
-  const parsedDate = new Date(`${bookingDate}T00:00:00.000Z`);
+  if (!mongoose.Types.ObjectId.isValid(timeSlotId)) {
+    throwError("Invalid timeSlotId", 400);
+  }
 
-  if (
-    Number.isNaN(parsedDate.getTime()) ||
-    parsedDate.toISOString().slice(0, 10) !== bookingDate
-  ) {
+  if (!mongoose.Types.ObjectId.isValid(addressId)) {
+    throwError("Invalid addressId", 400);
+  }
+
+  const selectedDate = new Date(bookingDate);
+
+  if (Number.isNaN(selectedDate.getTime())) {
     throwError("Invalid booking date", 400);
   }
 
   const today = new Date();
-  const todayString = [
-    today.getFullYear(),
-    String(today.getMonth() + 1).padStart(2, "0"),
-    String(today.getDate()).padStart(2, "0")
-  ].join("-");
+  today.setHours(0, 0, 0, 0);
 
-  if (bookingDate < todayString) {
+  const normalizedBookingDate = new Date(selectedDate);
+  normalizedBookingDate.setHours(0, 0, 0, 0);
+
+  if (normalizedBookingDate < today) {
     throwError("Booking date cannot be in the past", 400);
   }
 
-  // Time slot ID validation
-  if (!mongoose.Types.ObjectId.isValid(timeSlotId)) {
-    throwError("Invalid time slot ID", 400);
+  // VERIFY CUSTOMER ADDRESS
+  const address = await Address.findOne({
+    _id: addressId,
+    customer: customerId,
+  });
+
+  if (!address) {
+    throwError("Address not found or does not belong to customer", 404);
   }
 
-  // Reserve slot capacity atomically
+  // RESERVE TIME SLOT
   const reservedSlot = await TimeSlot.findOneAndUpdate(
     {
       _id: timeSlotId,
-      date: bookingDate,
+      date: normalizedBookingDate,
       isActive: true,
       $expr: {
-        $lt: ["$bookedCount", "$capacity"]
-      }
+        $lt: ["$bookedCount", "$capacity"],
+      },
     },
     {
       $inc: {
-        bookedCount: 1
-      }
+        bookedCount: 1,
+      },
     },
     {
-      new: true
+      new: true,
     }
   );
 
   if (!reservedSlot) {
-    throwError("Time slot is unavailable or fully booked", 409);
+    throwError("Selected time slot is unavailable", 400);
   }
 
   try {
-    // Create booking
     const booking = await bookingRepository.createBooking({
       customer: customerId,
-      patientName: patientName.trim(),
-      testName: testName.trim(),
+      patientName,
+      testName,
       age: Number(age),
-      gender: normalizedGender,
-      phone: phone.trim(),
-      email: normalizedEmail,
-      bookingDate: parsedDate,
+      gender,
+      phone,
+      email: email.toLowerCase(),
+      bookingDate: normalizedBookingDate,
       timeSlotId: reservedSlot._id,
       timeSlot: `${reservedSlot.startTime}-${reservedSlot.endTime}`,
-      notes: notes || ""
+      addressId,
+      notes: notes || "",
     });
 
-    return booking;
-
+    return await bookingRepository.findBookingById(
+      booking._id,
+      customerId
+    );
   } catch (error) {
-    // Release reserved capacity if booking creation fails
+    // RELEASE SLOT IF BOOKING CREATION FAILS
     await TimeSlot.updateOne(
       {
         _id: reservedSlot._id,
-        bookedCount: { $gt: 0 }
+        bookedCount: { $gt: 0 },
       },
       {
-        $inc: { bookedCount: -1 }
+        $inc: { bookedCount: -1 },
       }
     );
 
@@ -153,8 +147,9 @@ const createBooking = async (customerId, data) => {
 };
 
 // GET CUSTOMER BOOKINGS
-const getCustomerBookings = (customerId) =>
-  bookingRepository.findBookingsByCustomer(customerId);
+const getCustomerBookings = async (customerId) => {
+  return await bookingRepository.findBookingsByCustomer(customerId);
+};
 
 // GET BOOKING BY ID
 const getBookingById = async (bookingId, customerId) => {
@@ -187,22 +182,22 @@ const updateCustomerBooking = async (bookingId, customerId, data) => {
     "gender",
     "phone",
     "email",
-    "notes"
+    "notes",
   ];
 
   const updateData = {};
 
-  allowedFields.forEach((field) => {
+  for (const field of allowedFields) {
     if (data[field] !== undefined) {
       updateData[field] = data[field];
     }
-  });
+  }
 
   if (updateData.age !== undefined) {
     if (
       !Number.isInteger(Number(updateData.age)) ||
-      Number(updateData.age) < 1 ||
-      Number(updateData.age) > 120
+      updateData.age < 1 ||
+      updateData.age > 120
     ) {
       throwError("Age must be between 1 and 120", 400);
     }
@@ -210,38 +205,19 @@ const updateCustomerBooking = async (bookingId, customerId, data) => {
     updateData.age = Number(updateData.age);
   }
 
-  if (updateData.gender !== undefined) {
-    updateData.gender =
-      updateData.gender.trim().charAt(0).toUpperCase() +
-      updateData.gender.trim().slice(1).toLowerCase();
-
-    if (!["Male", "Female", "Other"].includes(updateData.gender)) {
-      throwError("Invalid gender", 400);
-    }
+  if (
+    updateData.gender !== undefined &&
+    !["Male", "Female", "Other"].includes(updateData.gender)
+  ) {
+    throwError("Invalid gender", 400);
   }
 
   if (updateData.email !== undefined) {
-    updateData.email = updateData.email.trim().toLowerCase();
-
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(updateData.email)) {
       throwError("Invalid email address", 400);
     }
-  }
 
-  if (updateData.patientName !== undefined) {
-    updateData.patientName = updateData.patientName.trim();
-  }
-
-  if (updateData.testName !== undefined) {
-    updateData.testName = updateData.testName.trim();
-  }
-
-  if (updateData.phone !== undefined) {
-    updateData.phone = updateData.phone.trim();
-  }
-
-  if (Object.keys(updateData).length === 0) {
-    throwError("No valid fields provided for update", 400);
+    updateData.email = updateData.email.toLowerCase();
   }
 
   const booking = await bookingRepository.updateBooking(
@@ -263,10 +239,16 @@ const deleteCustomerBooking = async (bookingId, customerId) => {
     throwError("Invalid booking ID", 400);
   }
 
-  throwError(
-    "Booking deletion must release its reserved time slot. Implement this with the booking repository before enabling deletion.",
-    501
+  const booking = await bookingRepository.deleteBooking(
+    bookingId,
+    customerId
   );
+
+  if (!booking) {
+    throwError("Booking not found", 404);
+  }
+
+  return booking;
 };
 
 module.exports = {
@@ -274,5 +256,5 @@ module.exports = {
   getCustomerBookings,
   getBookingById,
   updateCustomerBooking,
-  deleteCustomerBooking
+  deleteCustomerBooking,
 };

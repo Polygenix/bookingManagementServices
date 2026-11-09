@@ -1,3 +1,4 @@
+
 const swaggerSpec = {
   openapi: "3.0.3",
 
@@ -64,6 +65,7 @@ const swaggerSpec = {
         },
       },
 
+      // UPDATED BOOKING REQUEST
       BookingRequest: {
         type: "object",
         required: [
@@ -72,8 +74,10 @@ const swaggerSpec = {
           "age",
           "gender",
           "phone",
+          "email",
           "bookingDate",
-          "timeSlot",
+          "timeSlotId",
+          "addressId",
         ],
         properties: {
           patientName: { type: "string", example: "Rahul Sharma" },
@@ -81,8 +85,8 @@ const swaggerSpec = {
           age: { type: "integer", example: 25 },
           gender: {
             type: "string",
-            enum: ["male", "female", "other"],
-            example: "male",
+            enum: ["Male", "Female", "Other"],
+            example: "Male",
           },
           phone: { type: "string", example: "9876543210" },
           email: { type: "string", example: "rahul@example.com" },
@@ -91,8 +95,53 @@ const swaggerSpec = {
             format: "date",
             example: "2026-11-10",
           },
-          timeSlot: { type: "string", example: "10:00 AM" },
+          timeSlotId: {
+            type: "string",
+            example: "672abc123456789012345678",
+            description: "Selected Time Slot MongoDB ID",
+          },
+          addressId: {
+            type: "string",
+            example: "672def123456789012345678",
+            description: "Selected Customer Address MongoDB ID",
+          },
           notes: { type: "string", example: "Fasting required" },
+        },
+      },
+
+      // CUSTOMER BOOKING UPDATE REQUEST
+      BookingUpdateRequest: {
+        type: "object",
+        properties: {
+          patientName: {
+            type: "string",
+            example: "Rahul Sharma",
+          },
+          testName: {
+            type: "string",
+            example: "Blood Test",
+          },
+          age: {
+            type: "integer",
+            example: 25,
+          },
+          gender: {
+            type: "string",
+            enum: ["Male", "Female", "Other"],
+            example: "Male",
+          },
+          phone: {
+            type: "string",
+            example: "9876543210",
+          },
+          email: {
+            type: "string",
+            example: "rahul@example.com",
+          },
+          notes: {
+            type: "string",
+            example: "Fasting required",
+          },
         },
       },
     },
@@ -175,7 +224,10 @@ const swaggerSpec = {
 
         responses: {
           201: { description: "Booking created successfully" },
+          400: { description: "Validation error" },
           401: { description: "Unauthorized" },
+          404: { description: "Address not found" },
+          409: { description: "Time slot unavailable or fully booked" },
           500: { description: "Internal server error" },
         },
       },
@@ -234,7 +286,7 @@ const swaggerSpec = {
           content: {
             "application/json": {
               schema: {
-                $ref: "#/components/schemas/BookingRequest",
+                $ref: "#/components/schemas/BookingUpdateRequest",
               },
             },
           },

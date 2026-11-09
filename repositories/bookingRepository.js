@@ -1,3 +1,4 @@
+
 const Booking = require("../models/Booking");
 const TimeSlot = require("../models/TimeSlot");
 
@@ -5,32 +6,57 @@ const createBooking = async (bookingData) => {
   return await Booking.create(bookingData);
 };
 
-const findBookingsByCustomer = async (customerId) => {
-  return await Booking.find({ customer: customerId })
+// GET ALL BOOKINGS
+const findAllBookings = async () => {
+  return await Booking.find()
+    .populate("customer")
     .populate("timeSlotId")
+    .populate("addressId")
     .sort({ createdAt: -1 });
 };
 
+// GET CUSTOMER BOOKINGS
+const findBookingsByCustomer = async (customerId) => {
+  return await Booking.find({ customer: customerId })
+    .populate("timeSlotId")
+    .populate("addressId")
+    .sort({ createdAt: -1 });
+};
+
+// GET BOOKING BY ID
 const findBookingById = async (bookingId, customerId) => {
   return await Booking.findOne({
     _id: bookingId,
-    customer: customerId
-  }).populate("timeSlotId");
+    customer: customerId,
+  })
+    .populate("timeSlotId")
+    .populate("addressId");
 };
 
+// UPDATE BOOKING
 const updateBooking = async (bookingId, customerId, data) => {
   return await Booking.findOneAndUpdate(
-    { _id: bookingId, customer: customerId },
-    { $set: data },
-    { new: true, runValidators: true }
-  );
+    {
+      _id: bookingId,
+      customer: customerId,
+    },
+    {
+      $set: data,
+    },
+    {
+      new: true,
+      runValidators: true,
+    }
+  )
+    .populate("timeSlotId")
+    .populate("addressId");
 };
 
-// Delete booking and release slot capacity
+// DELETE BOOKING AND RELEASE SLOT CAPACITY
 const deleteBooking = async (bookingId, customerId) => {
   const booking = await Booking.findOne({
     _id: bookingId,
-    customer: customerId
+    customer: customerId,
   });
 
   if (!booking) {
@@ -49,25 +75,23 @@ const deleteBooking = async (bookingId, customerId) => {
     throw error;
   }
 
-  // Delete booking
   const deletedBooking = await Booking.findOneAndDelete({
     _id: bookingId,
-    customer: customerId
+    customer: customerId,
   });
 
   if (!deletedBooking) {
     return null;
   }
 
-  // Release reserved slot capacity
   if (deletedBooking.timeSlotId) {
     await TimeSlot.updateOne(
       {
         _id: deletedBooking.timeSlotId,
-        bookedCount: { $gt: 0 }
+        bookedCount: { $gt: 0 },
       },
       {
-        $inc: { bookedCount: -1 }
+        $inc: { bookedCount: -1 },
       }
     );
   }
@@ -77,8 +101,9 @@ const deleteBooking = async (bookingId, customerId) => {
 
 module.exports = {
   createBooking,
+  findAllBookings,
   findBookingsByCustomer,
   findBookingById,
   updateBooking,
-  deleteBooking
+  deleteBooking,
 };

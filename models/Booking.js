@@ -1,3 +1,4 @@
+
 const mongoose = require("mongoose");
 
 const bookingSchema = new mongoose.Schema(
@@ -52,16 +53,20 @@ const bookingSchema = new mongoose.Schema(
       required: true,
     },
 
-    // Reference to TimeSlot collection
     timeSlotId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "TimeSlot",
       required: true,
     },
 
-    // Automatically generated from TimeSlot
     timeSlot: {
       type: String,
+      required: true,
+    },
+
+    addressId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Address",
       required: true,
     },
 
@@ -78,7 +83,7 @@ const bookingSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  },
+  }
 );
 
 module.exports = mongoose.model("Booking", bookingSchema);

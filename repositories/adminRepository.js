@@ -1,42 +1,36 @@
+const Booking = require("../models/Booking");
 
-const Test = require("../models/Test");
-
-// Create Test
-const createTest = async (data) => {
-  return await Test.create(data);
+const findAllBookings = async () => {
+  return await Booking.find()
+    .populate("customer")
+    .populate("timeSlotId")
+    .populate("addressId")
+    .sort({ createdAt: -1 });
 };
 
-// Get All Tests
-const getAllTests = async () => {
-  return await Test.find().sort({ createdAt: -1 });
+const findBookingById = async (id) => {
+  return await Booking.findById(id)
+    .populate("customer")
+    .populate("timeSlotId")
+    .populate("addressId");
 };
 
-// Get Test By ID
-const getTestById = async (id) => {
-  return await Test.findById(id);
-};
-
-// Update Test
-const updateTest = async (id, updateData) => {
-  return await Test.findByIdAndUpdate(
+const updateBooking = async (id, updateData) => {
+  return await Booking.findByIdAndUpdate(
     id,
     { $set: updateData },
     {
       new: true,
       runValidators: true
     }
-  );
-};
-
-// Delete Test
-const deleteTest = async (id) => {
-  return await Test.findByIdAndDelete(id);
+  )
+    .populate("customer")
+    .populate("timeSlotId")
+    .populate("addressId");
 };
 
 module.exports = {
-  createTest,
-  getAllTests,
-  getTestById,
-  updateTest,
-  deleteTest
+  findAllBookings,
+  findBookingById,
+  updateBooking
 };

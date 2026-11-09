@@ -99,11 +99,15 @@ const updateBookingStatus = async (id, status) => {
         await releaseSlotCapacity(booking, session);
       }
 
-      booking.status = status;
-
-      await booking.save({ session });
-
-      updatedBooking = booking;
+      updatedBooking = await Booking.findByIdAndUpdate(
+        id,
+        { $set: { status } },
+        {
+          new: true,
+          runValidators: true,
+          session
+        }
+      );
     });
   } finally {
     await session.endSession();
