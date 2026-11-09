@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 
 const Booking = require("../models/Booking");
 const TimeSlot = require("../models/TimeSlot");
+const Test = require("../models/Test");
 
 // Release reserved slot capacity
 const releaseSlotCapacity = async (booking, session) => {
@@ -127,6 +128,7 @@ const updateBooking = async (id, data) => {
   const allowedFields = [
     "patientName",
     "testName",
+    "testId",
     "age",
     "gender",
     "phone",
@@ -141,6 +143,44 @@ const updateBooking = async (id, data) => {
       updateData[field] = data[field];
     }
   });
+
+  if (updateData.testId !== undefined || updateData.testName !== undefined) {
+    let test;
+
+    if (updateData.testId !== undefined) {
+      if (!mongoose.Types.ObjectId.isValid(updateData.testId)) {
+        const error = new Error("Invalid test ID");
+        error.statusCode = 400;
+        throw error;
+      }
+
+      test = await Test.findOne({
+        _id: updateData.testId,
+        isActive: true
+      });
+    } else {
+      if (typeof updateData.testName !== "string") {
+        const error = new Error("Invalid test name");
+        error.statusCode = 400;
+        throw error;
+      }
+
+      test = await Test.findOne({
+        testName: updateData.testName.trim(),
+        isActive: true
+      });
+    }
+
+    if (!test) {
+      const error = new Error("Test not found or inactive");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    updateData.testId = test._id;
+    updateData.testName = test.testName;
+    updateData.amount = test.price;
+  }
 
   if (Object.keys(updateData).length === 0) {
     const error = new Error("No valid fields provided for update");

@@ -3,6 +3,7 @@ const crypto = require("crypto");
 const mongoose = require("mongoose");
 
 const Booking = require("../models/Booking");
+const Test = require("../models/Test");
 const paymentRepository = require("../repositories/paymentRepository");
 
 const razorpay = new Razorpay({
@@ -32,11 +33,58 @@ const createOrder = async (bookingId, customerId) => {
     throw error;
   }
 
-  // Assumption: booking.amount is stored in rupees.
-  const amountInRupees = Number(booking.amount);
+  let amountInRupees = booking.amount;
+
+  if (amountInRupees === undefined || amountInRupees === null) {
+    let catalogTest = booking.testId
+      ? await Test.findById(booking.testId)
+      : null;
+    let matchingTests = catalogTest ? [catalogTest] : [];
+
+    if (!catalogTest && typeof booking.testName === "string") {
+      const escapedTestName = booking.testName
+        .trim()
+        .replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      matchingTests = await Test.find({
+        testName: new RegExp(`^\\s*${escapedTestName}\\s*$`, "i")
+      }).limit(2);
+    }
+
+    if (matchingTests.length > 1) {
+      const error = new Error(
+        "Multiple catalog tests match this booking; update the booking test before payment"
+      );
+      error.statusCode = 409;
+      throw error;
+    }
+
+    catalogTest = matchingTests[0];
+
+    if (!catalogTest) {
+      const error = new Error(
+        `No catalog price found for booking test "${booking.testName}"`
+      );
+      error.statusCode = 400;
+      throw error;
+    }
+
+    amountInRupees = catalogTest.price;
+
+    await Booking.updateOne(
+      {
+        _id: booking._id,
+        $or: [{ amount: { $exists: false } }, { amount: null }]
+      },
+      { $set: { amount: amountInRupees } }
+    );
+  }
+
+  amountInRupees = Number(amountInRupees);
 
   if (!Number.isFinite(amountInRupees) || amountInRupees <= 0) {
-    const error = new Error("Invalid booking amount");
+    const error = new Error(
+      "Booking amount must be greater than zero to create a payment order"
+    );
     error.statusCode = 400;
     throw error;
   }

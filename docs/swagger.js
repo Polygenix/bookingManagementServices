@@ -68,9 +68,9 @@ const swaggerSpec = {
       // UPDATED BOOKING REQUEST
       BookingRequest: {
         type: "object",
+        anyOf: [{ required: ["testId"] }, { required: ["testName"] }],
         required: [
           "patientName",
-          "testName",
           "age",
           "gender",
           "phone",
@@ -82,6 +82,17 @@ const swaggerSpec = {
         properties: {
           patientName: { type: "string", example: "Rahul Sharma" },
           testName: { type: "string", example: "Blood Test" },
+          testId: {
+            type: "string",
+            example: "6af1a0ea1db09f05854d81ed",
+            description: "Selected active test catalog MongoDB ID",
+          },
+          amount: {
+            type: "number",
+            example: 500,
+            readOnly: true,
+            description: "Price copied from the active test catalog entry",
+          },
           age: { type: "integer", example: 25 },
           gender: {
             type: "string",

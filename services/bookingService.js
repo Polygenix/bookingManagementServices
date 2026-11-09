@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const bookingRepository = require("../repositories/bookingRepository");
 const TimeSlot = require("../models/TimeSlot");
 const Address = require("../models/Address");
+const Test = require("../models/Test");
 
 const throwError = (message, statusCode) => {
   const error = new Error(message);
@@ -16,6 +17,7 @@ const createBooking = async (customerId, data) => {
   const {
     patientName,
     testName,
+    testId,
     age,
     gender,
     phone,
@@ -28,7 +30,7 @@ const createBooking = async (customerId, data) => {
 
   if (
     !patientName ||
-    !testName ||
+    (!testId && !testName) ||
     !age ||
     !gender ||
     !phone ||
@@ -38,6 +40,25 @@ const createBooking = async (customerId, data) => {
     !addressId
   ) {
     throwError("All required booking fields must be provided", 400);
+  }
+
+  if (testId && !mongoose.Types.ObjectId.isValid(testId)) {
+    throwError("Invalid test ID", 400);
+  }
+
+  if (!testId && typeof testName !== "string") {
+    throwError("Invalid test name", 400);
+  }
+
+  const test = testId
+    ? await Test.findOne({ _id: testId, isActive: true })
+    : await Test.findOne({
+        testName: testName.trim(),
+        isActive: true
+      });
+
+  if (!test) {
+    throwError("Test not found or inactive", 404);
   }
 
   if (!Number.isInteger(Number(age)) || age < 1 || age > 120) {
@@ -71,6 +92,7 @@ const createBooking = async (customerId, data) => {
 
   const normalizedBookingDate = new Date(selectedDate);
   normalizedBookingDate.setHours(0, 0, 0, 0);
+  const slotDate = selectedDate.toISOString().slice(0, 10);
 
   if (normalizedBookingDate < today) {
     throwError("Booking date cannot be in the past", 400);
@@ -90,7 +112,7 @@ const createBooking = async (customerId, data) => {
   const reservedSlot = await TimeSlot.findOneAndUpdate(
     {
       _id: timeSlotId,
-      date: normalizedBookingDate,
+      date: slotDate,
       isActive: true,
       $expr: {
         $lt: ["$bookedCount", "$capacity"],
@@ -114,7 +136,9 @@ const createBooking = async (customerId, data) => {
     const booking = await bookingRepository.createBooking({
       customer: customerId,
       patientName,
-      testName,
+      testName: test.testName,
+      testId: test._id,
+      amount: test.price,
       age: Number(age),
       gender,
       phone,
@@ -178,6 +202,7 @@ const updateCustomerBooking = async (bookingId, customerId, data) => {
   const allowedFields = [
     "patientName",
     "testName",
+    "testId",
     "age",
     "gender",
     "phone",
@@ -218,6 +243,38 @@ const updateCustomerBooking = async (bookingId, customerId, data) => {
     }
 
     updateData.email = updateData.email.toLowerCase();
+  }
+
+  if (updateData.testId !== undefined || updateData.testName !== undefined) {
+    let test;
+
+    if (updateData.testId !== undefined) {
+      if (!mongoose.Types.ObjectId.isValid(updateData.testId)) {
+        throwError("Invalid test ID", 400);
+      }
+
+      test = await Test.findOne({
+        _id: updateData.testId,
+        isActive: true
+      });
+    } else {
+      if (typeof updateData.testName !== "string") {
+        throwError("Invalid test name", 400);
+      }
+
+      test = await Test.findOne({
+        testName: updateData.testName.trim(),
+        isActive: true
+      });
+    }
+
+    if (!test) {
+      throwError("Test not found or inactive", 404);
+    }
+
+    updateData.testId = test._id;
+    updateData.testName = test.testName;
+    updateData.amount = test.price;
   }
 
   const booking = await bookingRepository.updateBooking(

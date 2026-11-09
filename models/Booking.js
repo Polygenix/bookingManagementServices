@@ -21,6 +21,16 @@ const bookingSchema = new mongoose.Schema(
       trim: true,
     },
 
+    testId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Test",
+    },
+
+    amount: {
+      type: Number,
+      min: 0,
+    },
+
     age: {
       type: Number,
       required: true,
