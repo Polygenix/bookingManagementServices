@@ -5,38 +5,38 @@ const bookingSchema = new mongoose.Schema(
     customer: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true
+      required: true,
     },
 
     patientName: {
       type: String,
       required: true,
-      trim: true
+      trim: true,
     },
 
     testName: {
       type: String,
       required: true,
-      trim: true
+      trim: true,
     },
 
     age: {
       type: Number,
       required: true,
       min: 1,
-      max: 120
+      max: 120,
     },
 
     gender: {
       type: String,
       enum: ["Male", "Female", "Other"],
-      required: true
+      required: true,
     },
 
     phone: {
       type: String,
       required: true,
-      trim: true
+      trim: true,
     },
 
     email: {
@@ -44,41 +44,41 @@ const bookingSchema = new mongoose.Schema(
       required: true,
       lowercase: true,
       trim: true,
-      match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Invalid email address"]
+      match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Invalid email address"],
     },
 
     bookingDate: {
       type: Date,
-      required: true
+      required: true,
     },
 
     // Reference to TimeSlot collection
     timeSlotId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "TimeSlot",
-      required: true
+      required: true,
     },
 
     // Automatically generated from TimeSlot
     timeSlot: {
       type: String,
-      required: true
+      required: true,
     },
 
     notes: {
       type: String,
-      default: ""
+      default: "",
     },
 
     status: {
       type: String,
       enum: ["pending", "confirmed", "cancelled", "completed"],
-      default: "pending"
-    }
+      default: "pending",
+    },
   },
   {
-    timestamps: true
-  }
+    timestamps: true,
+  },
 );
 
 module.exports = mongoose.model("Booking", bookingSchema);
