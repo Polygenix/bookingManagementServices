@@ -13,6 +13,7 @@ const swaggerSpec = require("./docs/swagger");
 const testRoutes = require("./routes/testRoutes");
 const customerTestRoutes = require("./routes/customerTestRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
+const timeSlotRoutes = require("./routes/timeSlotRoutes");
 
 
 const uploadRoutes = require("./routes/uploadRoutes");
@@ -25,6 +26,7 @@ app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/common/upload", uploadRoutes);
 app.use("/api/customer/payments", paymentRoutes);
+app.use("/api/admin/time-slots", timeSlotRoutes);
 
 // Auth APIs
 app.use("/api/auth", authRoutes);

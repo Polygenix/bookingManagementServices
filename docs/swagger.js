@@ -796,162 +796,290 @@ const swaggerSpec = {
     // PAYMENT APIs
     // =========================================
 
-"/api/customer/payments/create-order": {
-  post: {
-    tags: ["Customer Payment"],
-    summary: "Create Razorpay Order",
-    operationId: "createPaymentOrder",
-    description: "Create a Razorpay order for a customer booking",
-    security: [{ BearerAuth: [] }],
+    "/api/customer/payments/create-order": {
+      post: {
+        tags: ["Customer Payment"],
+        summary: "Create Razorpay Order",
+        operationId: "createPaymentOrder",
+        description: "Create a Razorpay order for a customer booking",
+        security: [{ BearerAuth: [] }],
 
-    requestBody: {
-      required: true,
-      content: {
-        "application/json": {
-          schema: {
-            type: "object",
-            required: ["bookingId"],
-            properties: {
-              bookingId: {
-                type: "string",
-                example: "672abc123456789012345678"
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["bookingId"],
+                properties: {
+                  bookingId: {
+                    type: "string",
+                    example: "672abc123456789012345678"
+                  }
+                }
               }
             }
           }
-        }
-      }
-    },
-
-    responses: {
-      201: {
-        description: "Razorpay order created successfully"
-      },
-      400: {
-        description: "Invalid booking ID or booking amount"
-      },
-      401: {
-        description: "Unauthorized - Token required"
-      },
-      403: {
-        description: "Customer access required"
-      },
-      404: {
-        description: "Booking not found"
-      },
-      409: {
-        description: "Booking already paid"
-      },
-      500: {
-        description: "Internal server error"
-      }
-    }
-  }
-},
-
-"/api/customer/payments/verify": {
-  post: {
-    tags: ["Customer Payment"],
-    summary: "Verify Payment",
-    operationId: "verifyPayment",
-    description: "Verify Razorpay payment signature and captured payment",
-    security: [{ BearerAuth: [] }],
-
-    requestBody: {
-      required: true,
-      content: {
-        "application/json": {
-          schema: {
-            type: "object",
-            required: [
-              "razorpay_order_id",
-              "razorpay_payment_id",
-              "razorpay_signature"
-            ],
-            properties: {
-              razorpay_order_id: {
-                type: "string",
-                example: "order_example123"
-              },
-              razorpay_payment_id: {
-                type: "string",
-                example: "pay_example123"
-              },
-              razorpay_signature: {
-                type: "string",
-                example: "signature_example123"
-              }
-            }
-          }
-        }
-      }
-    },
-
-    responses: {
-      200: {
-        description: "Payment verified successfully"
-      },
-      400: {
-        description: "Invalid signature or payment not captured"
-      },
-      401: {
-        description: "Unauthorized - Token required"
-      },
-      403: {
-        description: "Customer access required"
-      },
-      404: {
-        description: "Payment order not found"
-      },
-      500: {
-        description: "Internal server error"
-      }
-    }
-  }
-},
-
-"/api/customer/payments/{id}": {
-  get: {
-    tags: ["Customer Payment"],
-    summary: "Get Payment Details",
-    operationId: "getPaymentDetails",
-    description: "Get payment details by payment ID",
-    security: [{ BearerAuth: [] }],
-
-    parameters: [
-      {
-        in: "path",
-        name: "id",
-        required: true,
-        schema: {
-          type: "string"
         },
-        description: "MongoDB Payment ID",
-        example: "672abc123456789012345678"
-      }
-    ],
 
-    responses: {
-      200: {
-        description: "Payment details fetched successfully"
-      },
-      400: {
-        description: "Invalid payment ID"
-      },
-      401: {
-        description: "Unauthorized - Token required"
-      },
-      403: {
-        description: "Customer access required"
-      },
-      404: {
-        description: "Payment not found"
-      },
-      500: {
-        description: "Internal server error"
+        responses: {
+          201: {
+            description: "Razorpay order created successfully"
+          },
+          400: {
+            description: "Invalid booking ID or booking amount"
+          },
+          401: {
+            description: "Unauthorized - Token required"
+          },
+          403: {
+            description: "Customer access required"
+          },
+          404: {
+            description: "Booking not found"
+          },
+          409: {
+            description: "Booking already paid"
+          },
+          500: {
+            description: "Internal server error"
+          }
+        }
       }
+    },
+
+    "/api/customer/payments/verify": {
+      post: {
+        tags: ["Customer Payment"],
+        summary: "Verify Payment",
+        operationId: "verifyPayment",
+        description: "Verify Razorpay payment signature and captured payment",
+        security: [{ BearerAuth: [] }],
+
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: [
+                  "razorpay_order_id",
+                  "razorpay_payment_id",
+                  "razorpay_signature"
+                ],
+                properties: {
+                  razorpay_order_id: {
+                    type: "string",
+                    example: "order_example123"
+                  },
+                  razorpay_payment_id: {
+                    type: "string",
+                    example: "pay_example123"
+                  },
+                  razorpay_signature: {
+                    type: "string",
+                    example: "signature_example123"
+                  }
+                }
+              }
+            }
+          }
+        },
+
+        responses: {
+          200: {
+            description: "Payment verified successfully"
+          },
+          400: {
+            description: "Invalid signature or payment not captured"
+          },
+          401: {
+            description: "Unauthorized - Token required"
+          },
+          403: {
+            description: "Customer access required"
+          },
+          404: {
+            description: "Payment order not found"
+          },
+          500: {
+            description: "Internal server error"
+          }
+        }
+      }
+    },
+
+    "/api/customer/payments/{id}": {
+      get: {
+        tags: ["Customer Payment"],
+        summary: "Get Payment Details",
+        operationId: "getPaymentDetails",
+        description: "Get payment details by payment ID",
+        security: [{ BearerAuth: [] }],
+
+        parameters: [
+          {
+            in: "path",
+            name: "id",
+            required: true,
+            schema: {
+              type: "string"
+            },
+            description: "MongoDB Payment ID",
+            example: "672abc123456789012345678"
+          }
+        ],
+
+        responses: {
+          200: {
+            description: "Payment details fetched successfully"
+          },
+          400: {
+            description: "Invalid payment ID"
+          },
+          401: {
+            description: "Unauthorized - Token required"
+          },
+          403: {
+            description: "Customer access required"
+          },
+          404: {
+            description: "Payment not found"
+          },
+          500: {
+            description: "Internal server error"
+          }
+        }
+      }
+    },
+
+    // =========================================
+    // TIME SLOT APIs
+    // =========================================
+      
+
+"/api/admin/time-slots": {
+  post: {
+    tags: ["Admin Time Slot"],
+    summary: "Create Time Slot",
+    operationId: "createTimeSlot",
+    security: [{ BearerAuth: [] }],
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            required: ["date", "startTime", "endTime", "capacity"],
+            properties: {
+              date: { type: "string", example: "2026-11-15" },
+              startTime: { type: "string", example: "10:00" },
+              endTime: { type: "string", example: "10:30" },
+              capacity: { type: "integer", example: 5 },
+              isActive: { type: "boolean", example: true }
+            }
+          }
+        }
+      }
+    },
+    responses: {
+      201: { description: "Time slot created successfully" },
+      400: { description: "Invalid input" },
+      401: { description: "Unauthorized" },
+      403: { description: "Admin access required" },
+      409: { description: "Time slot already exists" }
+    }
+  },
+  get: {
+    tags: ["Admin Time Slot"],
+    summary: "Get All Time Slots",
+    operationId: "getAllTimeSlots",
+    security: [{ BearerAuth: [] }],
+    parameters: [{
+      in: "query",
+      name: "date",
+      required: false,
+      schema: { type: "string", example: "2026-11-15" }
+    }],
+    responses: {
+      200: { description: "Time slots fetched successfully" },
+      401: { description: "Unauthorized" },
+      403: { description: "Admin access required" }
+    }
+  }
+},
+
+"/api/admin/time-slots/{id}": {
+  get: {
+    tags: ["Admin Time Slot"],
+    summary: "Get Time Slot By ID",
+    operationId: "getTimeSlotById",
+    security: [{ BearerAuth: [] }],
+    parameters: [{
+      in: "path",
+      name: "id",
+      required: true,
+      schema: { type: "string" }
+    }],
+    responses: {
+      200: { description: "Time slot details fetched successfully" },
+      400: { description: "Invalid time slot ID" },
+      404: { description: "Time slot not found" }
+    }
+  },
+  put: {
+    tags: ["Admin Time Slot"],
+    summary: "Update Time Slot",
+    operationId: "updateTimeSlot",
+    security: [{ BearerAuth: [] }],
+    parameters: [{
+      in: "path",
+      name: "id",
+      required: true,
+      schema: { type: "string" }
+    }],
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              date: { type: "string", example: "2026-11-15" },
+              startTime: { type: "string", example: "10:30" },
+              endTime: { type: "string", example: "11:00" },
+              capacity: { type: "integer", example: 6 },
+              isActive: { type: "boolean", example: true }
+            }
+          }
+        }
+      }
+    },
+    responses: {
+      200: { description: "Time slot updated successfully" },
+      400: { description: "Invalid input or capacity" },
+      404: { description: "Time slot not found" }
+    }
+  },
+  delete: {
+    tags: ["Admin Time Slot"],
+    summary: "Delete Time Slot",
+    operationId: "deleteTimeSlot",
+    security: [{ BearerAuth: [] }],
+    parameters: [{
+      in: "path",
+      name: "id",
+      required: true,
+      schema: { type: "string" }
+    }],
+    responses: {
+      200: { description: "Time slot deleted successfully" },
+      400: { description: "Slot already has bookings" },
+      404: { description: "Time slot not found" }
     }
   }
 }
+
 
 
   },
