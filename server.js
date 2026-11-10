@@ -38,6 +38,7 @@ app.use(
   customerTimeSlotRoutes
 );
 app.use("/api/customer/addresses", addressRoutes);
+app.use("/api/admin/reports", reportRoutes);
 
 
 // Auth APIs
