@@ -14,12 +14,6 @@ router.post(
   reportController.uploadReport
 );
 
-router.get(
-  "/booking/:bookingId",
-  authenticate,
-  authorize("admin"),
-  reportController.getReportsByBooking
-);
 
 router.get(
   "/fetchAllReports",
