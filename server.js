@@ -33,10 +33,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/common/upload", uploadRoutes);
 app.use("/api/customer/payments", paymentRoutes);
 app.use("/api/admin/time-slots", timeSlotRoutes);
-app.use(
-  "/api/customer/time-slots",
-  customerTimeSlotRoutes
-);
+app.use( "/api/customer/time-slots",customerTimeSlotRoutes);
 app.use("/api/customer/addresses", addressRoutes);
 app.use("/api/admin/reports", reportRoutes);
 
@@ -47,7 +44,7 @@ app.use("/api/admin/tests", testRoutes);
 app.use("/api/customer/tests", customerTestRoutes);
 // Swagger
 app.use(
-  "/BookingManagementServices",
+ "/BookingManagementServices",
   swaggerUi.serve,
   swaggerUi.setup(swaggerSpec)
 );
