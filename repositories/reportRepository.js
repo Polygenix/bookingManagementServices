@@ -10,7 +10,16 @@ const findReportsByBooking = async (bookingId) => {
     .sort({ createdAt: -1 });
 };
 
+// GET ALL REPORTS
+const findAllReports = async () => {
+  return await Report.find()
+    .populate("bookingId")
+    .populate("uploadedBy", "name email")
+    .sort({ createdAt: -1 });
+};
+
 module.exports = {
   createReport,
   findReportsByBooking,
+  findAllReports,
 };

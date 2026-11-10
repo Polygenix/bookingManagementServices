@@ -50,7 +50,15 @@ const getReportsByBooking = async (bookingId) => {
   return await reportRepository.findReportsByBooking(bookingId);
 };
 
+// ADMIN GET ALL REPORTS
+const getAllReports = async () => {
+  const reports = await reportRepository.findAllReports();
+
+  return reports;
+};
+
 module.exports = {
   uploadReport,
   getReportsByBooking,
+  getAllReports,
 };

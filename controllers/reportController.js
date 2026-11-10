@@ -39,7 +39,27 @@ const getReportsByBooking = async (req, res) => {
   }
 };
 
+// ADMIN GET ALL REPORTS
+const getAllReports = async (req, res) => {
+  try {
+    const reports = await reportService.getAllReports();
+
+    return res.status(200).json({
+      success: true,
+      message: "All reports fetched successfully",
+      count: reports.length,
+      data: reports,
+    });
+  } catch (error) {
+    return res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   uploadReport,
   getReportsByBooking,
+  getAllReports,
 };

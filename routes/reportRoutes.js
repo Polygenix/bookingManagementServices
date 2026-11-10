@@ -21,4 +21,11 @@ router.get(
   reportController.getReportsByBooking
 );
 
+router.get(
+  "/fetchAllReports",
+  authenticate,
+  authorize("admin"),
+  reportController.getAllReports
+);
+
 module.exports = router;

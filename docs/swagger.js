@@ -8,18 +8,18 @@ const swaggerSpec = {
   },
 
   servers: [
-    {
-      url: "http://localhost:5002",
-      description: "Local Server",
-    },
+    // {
+    //   url: "http://localhost:5002",
+    //   description: "Local Server",
+    // },
     // {
     //   url: "https://bookingmanagementservices.onrender.com",
     //   description: "Production Server",
     // },
-    // {
-    //   url: "https://api.devankit.co.in",
-    //   description: "Production Server",
-    // },
+    {
+      url: "https://api.devankit.co.in",
+      description: "Production Server",
+    },
   ],
 
 
@@ -1685,6 +1685,26 @@ const swaggerSpec = {
     },
   },
     },
+
+    "/api/admin/fetchAllReports": {
+  get: {
+    tags: ["Admin Reports"],
+    summary: "Fetch all reports",
+    description: "Admin can fetch all uploaded reports",
+    security: [{ BearerAuth: [] }],
+    responses: {
+      200: {
+        description: "All reports fetched successfully",
+      },
+      401: {
+        description: "Unauthorized",
+      },
+      403: {
+        description: "Admin access required",
+      },
+    },
+  },
+},
     
   },
 };

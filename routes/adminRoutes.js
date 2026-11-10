@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const adminController = require("../controllers/adminController");
+const reportController = require("../controllers/reportController");
 
 const {
   authenticate,
@@ -38,6 +39,13 @@ router.delete(
   authenticate,
   authorize("admin"),
   adminController.deleteBooking
+);
+
+router.get(
+  "/fetchAllReports",
+  authenticate,
+  authorize("admin"),
+  reportController.getAllReports
 );
 
 module.exports = router;
