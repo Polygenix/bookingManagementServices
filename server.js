@@ -51,6 +51,7 @@ app.use(
   swaggerUi.serve,
   swaggerUi.setup(swaggerSpec)
 );
+app.use("/api/admin", reportRoutes);
 
 // Customer Booking APIs
 app.use("/api/customer/bookings", bookingRoutes);

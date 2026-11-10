@@ -1704,8 +1704,46 @@ const swaggerSpec = {
       },
     },
   },
-},
+    },
     
+    "/api/admin/deleteReports/{reportId}": {
+  delete: {
+    tags: ["Admin Reports"],
+    summary: "Delete report",
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
+    parameters: [
+      {
+        in: "path",
+        name: "reportId",
+        required: true,
+        schema: {
+          type: "string",
+        },
+      },
+    ],
+    responses: {
+      200: {
+        description: "Report deleted successfully",
+      },
+      400: {
+        description: "Invalid report ID",
+      },
+      401: {
+        description: "Unauthorized",
+      },
+      403: {
+        description: "Admin access required",
+      },
+      404: {
+        description: "Report not found",
+      },
+    },
+  },
+},
   },
 };
 

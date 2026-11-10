@@ -58,8 +58,26 @@ const getAllReports = async (req, res) => {
   }
 };
 
+const deleteReport = async (req, res) => {
+  try {
+    const report = await reportService.deleteReport(req.params.reportId);
+
+    return res.status(200).json({
+      success: true,
+      message: "Report deleted successfully",
+      data: report,
+    });
+  } catch (error) {
+    return res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   uploadReport,
   getReportsByBooking,
   getAllReports,
+  deleteReport,
 };

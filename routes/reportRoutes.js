@@ -22,4 +22,11 @@ router.get(
   reportController.getAllReports
 );
 
+router.delete(
+  "/deleteReports/:reportId",
+  authenticate,
+  authorize("admin"),
+  reportController.deleteReport
+);
+
 module.exports = router;

@@ -57,8 +57,24 @@ const getAllReports = async () => {
   return reports;
 };
 
+
+const deleteReport = async (reportId) => {
+  if (!mongoose.Types.ObjectId.isValid(reportId)) {
+    throwError("Invalid report ID", 400);
+  }
+
+  const report = await reportRepository.deleteReportById(reportId);
+
+  if (!report) {
+    throwError("Report not found", 404);
+  }
+
+  return report;
+};
+
 module.exports = {
   uploadReport,
   getReportsByBooking,
   getAllReports,
+  deleteReport,
 };

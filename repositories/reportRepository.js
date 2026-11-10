@@ -18,8 +18,13 @@ const findAllReports = async () => {
     .sort({ createdAt: -1 });
 };
 
+const deleteReportById = async (reportId) => {
+  return await Report.findByIdAndDelete(reportId);
+};
+
 module.exports = {
   createReport,
   findReportsByBooking,
   findAllReports,
+  deleteReportById,
 };
