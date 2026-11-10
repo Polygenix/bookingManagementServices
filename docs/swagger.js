@@ -8,18 +8,18 @@ const swaggerSpec = {
   },
 
   servers: [
-    // {
-    //   url: "http://localhost:5002",
-    //   description: "Local Server",
-    // },
+    {
+      url: "http://localhost:5002",
+      description: "Local Server",
+    },
     // {
     //   url: "https://bookingmanagementservices.onrender.com",
     //   description: "Production Server",
     // },
-    {
-      url: "https://api.devankit.co.in",
-      description: "Production Server",
-    },
+    // {
+    //   url: "https://api.devankit.co.in",
+    //   description: "Production Server",
+    // },
   ],
 
   tags: [
@@ -882,6 +882,7 @@ const swaggerSpec = {
     },
 
     // =========================================
+
     // COMMON FILE UPLOAD API
     // =========================================
 
@@ -1630,6 +1631,58 @@ const swaggerSpec = {
           404: { description: "Address not found" },
         },
       },
+    },
+
+    // =========================================
+    // REPORT APIs
+    // =========================================
+
+    "/api/admin/reports/upload": {
+    post: {
+    tags: ["Admin Reports"],
+    summary: "Add report URL to booking",
+    description: "Admin adds a report URL against a booking ID.",
+    security: [{ BearerAuth: [] }],
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            required: ["bookingId", "fileUrl"],
+            properties: {
+              bookingId: {
+                type: "string",
+                example: "673a12345678901234567891",
+              },
+              fileUrl: {
+                type: "string",
+                format: "uri",
+                example: "https://example.com/reports/blood-test-report.pdf",
+              },
+            },
+          },
+        },
+      },
+    },
+    responses: {
+      201: {
+        description: "Report URL added successfully",
+      },
+      400: {
+        description: "Invalid booking ID or file URL",
+      },
+      401: {
+        description: "Unauthorized",
+      },
+      403: {
+        description: "Admin access required",
+      },
+      404: {
+        description: "Booking not found",
+      },
+    },
+  },
     },
     
   },

@@ -89,17 +89,41 @@ const createOrder = async (bookingId, customerId) => {
     throw error;
   }
 
-  const existingPaidPayment = await paymentRepository.findByOrderId(
-    booking.razorpayOrderId
+  const existingPaidPayment = await paymentRepository.findByBookingAndStatus(
+    booking._id,
+    "paid"
   );
 
-  if (existingPaidPayment?.status === "paid") {
+  if (existingPaidPayment) {
     const error = new Error("This booking has already been paid");
     error.statusCode = 409;
     throw error;
   }
 
   const amountInPaise = Math.round(amountInRupees * 100);
+  const existingPendingPayment =
+    await paymentRepository.findByBookingAndStatus(booking._id, "pending");
+
+  if (existingPendingPayment) {
+    if (
+      existingPendingPayment.amount !== amountInPaise ||
+      existingPendingPayment.currency !== "INR"
+    ) {
+      const error = new Error(
+        "An existing pending payment has a different amount; resolve it before creating another order"
+      );
+      error.statusCode = 409;
+      throw error;
+    }
+
+    return {
+      paymentId: existingPendingPayment._id,
+      orderId: existingPendingPayment.razorpayOrderId,
+      amount: existingPendingPayment.amount,
+      currency: existingPendingPayment.currency,
+      keyId: process.env.RAZORPAY_KEY_ID
+    };
+  }
 
   const order = await razorpay.orders.create({
     amount: amountInPaise,

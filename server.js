@@ -16,6 +16,8 @@ const paymentRoutes = require("./routes/paymentRoutes");
 const timeSlotRoutes = require("./routes/timeSlotRoutes");
 const customerTimeSlotRoutes = require("./routes/customerTimeSlotRoutes");
 const addressRoutes = require("./routes/addressRoutes");
+const reportRoutes = require("./routes/reportRoutes");
+
 
 
 
@@ -36,6 +38,7 @@ app.use(
   customerTimeSlotRoutes
 );
 app.use("/api/customer/addresses", addressRoutes);
+app.use("/api/admin/reports", reportRoutes);
 
 // Auth APIs
 app.use("/api/auth", authRoutes);
