@@ -1790,10 +1790,11 @@ const swaggerSpec = {
     },
 
     //========================================= 
-      //admin customer APIs
+    //admin customer APIs
     //=========================================
+
     "/api/admin/fetchAllCustomers": {
-  get: {
+    get: {
     tags: ["Admin Customer"],
     summary: "Fetch All Customers",
     description: "Admin can fetch all registered customers with pagination and search.",
@@ -1908,7 +1909,7 @@ const swaggerSpec = {
       },
     },
   },
-},
+    },
   },
 };
 
