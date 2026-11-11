@@ -2013,7 +2013,62 @@ const swaggerSpec = {
     },
   },
     },
-    
+
+    "/api/admin/updateCustomerStatus/{customerId}": {
+    patch: {
+    tags: ["Admin Customer"],
+    summary: "Update Customer Status",
+    description: "Admin can activate or deactivate a customer account",
+    security: [
+      {
+        BearerAuth: [],
+      },
+    ],
+    parameters: [
+      {
+        in: "path",
+        name: "customerId",
+        required: true,
+        schema: {
+          type: "string",
+        },
+        description: "Customer MongoDB ID",
+      },
+    ],
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            required: ["isActive"],
+            properties: {
+              isActive: {
+                type: "boolean",
+                example: false,
+              },
+            },
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: "Customer status updated successfully",
+      },
+      400: {
+        description: "Invalid customer ID or status",
+      },
+      404: {
+        description: "Customer not found",
+      },
+      500: {
+        description: "Internal server error",
+      },
+    },
+  },
+},
+
   },
 };
 

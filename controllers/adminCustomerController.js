@@ -153,8 +153,66 @@ const updateCustomer = async (req, res) => {
   }
 };
 
+// Update Customer Status
+const updateCustomerStatus = async (req, res) => {
+  try {
+    const { customerId } = req.params;
+    const { isActive } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(customerId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid customer ID",
+      });
+    }
+
+    if (typeof isActive !== "boolean") {
+      return res.status(400).json({
+        success: false,
+        message: "isActive must be true or false",
+      });
+    }
+
+    const customer = await User.findOneAndUpdate(
+      {
+        _id: customerId,
+        role: "customer",
+      },
+      {
+        $set: { isActive },
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    ).select("-password");
+
+    if (!customer) {
+      return res.status(404).json({
+        success: false,
+        message: "Customer not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `Customer ${isActive ? "activated" : "deactivated"} successfully`,
+      data: customer,
+    });
+  } catch (error) {
+    console.error("Update Customer Status Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to update customer status",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   fetchAllCustomers,
   fetchCustomerById,
   updateCustomer,
+  updateCustomerStatus,
 };

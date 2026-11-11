@@ -18,4 +18,9 @@ router.put(
   adminCustomerController.updateCustomer
 );
 
+router.patch(
+  "/updateCustomerStatus/:customerId",
+  adminCustomerController.updateCustomerStatus
+);
+
 module.exports = router;
