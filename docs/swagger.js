@@ -8,18 +8,18 @@ const swaggerSpec = {
   },
 
   servers: [
-    // {
-    //   url: "http://localhost:5002",
-    //   description: "Local Server",
-    // },
+    {
+      url: "http://localhost:5002",
+      description: "Local Server",
+    },
     // {
     //   url: "https://bookingmanagementservices.onrender.com",
     //   description: "Production Server",
     // },
-    {
-      url: "https://api.devankit.co.in",
-      description: "Production Server",
-    },
+    // {
+    //   url: "https://api.devankit.co.in",
+    //   description: "Production Server",
+    // },
   ],
 
 
@@ -1704,6 +1704,26 @@ const swaggerSpec = {
       },
     },
   },
+    },
+
+    "/api/customer/reports": {
+      get: {
+        tags: ["Customer Reports"],
+        summary: "Fetch reports for the authenticated customer",
+        description: "Returns reports linked only to the authenticated customer's bookings.",
+        security: [{ BearerAuth: [] }],
+        responses: {
+          200: {
+            description: "Customer reports fetched successfully",
+          },
+          401: {
+            description: "Unauthorized",
+          },
+          403: {
+            description: "Customer access required",
+          },
+        },
+      },
     },
     
     "/api/admin/deleteReports/{reportId}": {

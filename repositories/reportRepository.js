@@ -10,6 +10,12 @@ const findReportsByBooking = async (bookingId) => {
     .sort({ createdAt: -1 });
 };
 
+const findReportsByBookings = async (bookingIds) => {
+  return await Report.find({ bookingId: { $in: bookingIds } })
+    .populate("bookingId", "patientName testName bookingDate status")
+    .sort({ createdAt: -1 });
+};
+
 // GET ALL REPORTS
 const findAllReports = async () => {
   return await Report.find()
@@ -25,6 +31,7 @@ const deleteReportById = async (reportId) => {
 module.exports = {
   createReport,
   findReportsByBooking,
+  findReportsByBookings,
   findAllReports,
   deleteReportById,
 };

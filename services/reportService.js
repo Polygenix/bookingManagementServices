@@ -50,6 +50,14 @@ const getReportsByBooking = async (bookingId) => {
   return await reportRepository.findReportsByBooking(bookingId);
 };
 
+const getCustomerReports = async (customerId) => {
+  const bookings = await Booking.find({ customer: customerId }).select("_id");
+
+  return await reportRepository.findReportsByBookings(
+    bookings.map((booking) => booking._id)
+  );
+};
+
 // ADMIN GET ALL REPORTS
 const getAllReports = async () => {
   const reports = await reportRepository.findAllReports();
@@ -75,6 +83,7 @@ const deleteReport = async (reportId) => {
 module.exports = {
   uploadReport,
   getReportsByBooking,
+  getCustomerReports,
   getAllReports,
   deleteReport,
 };

@@ -39,6 +39,24 @@ const getReportsByBooking = async (req, res) => {
   }
 };
 
+const getCustomerReports = async (req, res) => {
+  try {
+    const reports = await reportService.getCustomerReports(req.user._id);
+
+    return res.status(200).json({
+      success: true,
+      message: "Customer reports fetched successfully",
+      count: reports.length,
+      data: reports,
+    });
+  } catch (error) {
+    return res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 // ADMIN GET ALL REPORTS
 const getAllReports = async (req, res) => {
   try {
@@ -78,6 +96,7 @@ const deleteReport = async (req, res) => {
 module.exports = {
   uploadReport,
   getReportsByBooking,
+  getCustomerReports,
   getAllReports,
   deleteReport,
 };
