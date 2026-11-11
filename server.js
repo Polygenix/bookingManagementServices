@@ -26,6 +26,7 @@ const adminCustomerRoutes = require("./routes/adminCustomerRoutes");
 
 
 
+
 const uploadRoutes = require("./routes/uploadRoutes");
 
 const app = express();
@@ -40,6 +41,7 @@ app.use("/api/customer/addresses", addressRoutes);
 app.use("/api/customer/reports", customerReportRoutes);
 app.use("/api/admin/reports", reportRoutes);
 app.use("/api/admin", adminCustomerRoutes);
+
 
 // Auth APIs
 app.use("/api/auth", authRoutes);
