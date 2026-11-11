@@ -13,6 +13,20 @@ Both roles use the **same two endpoints**:
 4. Run `npm run dev`
 5. Open `http://localhost:5002/api-docs/`
 
+## Persistent uploads on Render
+
+Render's local filesystem is temporary. To keep uploaded files available after
+restarts or deployments:
+
+1. Add a Persistent Disk to the Render web service, mounted at `/var/data`.
+2. Set the service environment variable `UPLOADS_DIR` to `/var/data/uploads`.
+3. Redeploy the service, then upload the files again. Files uploaded before the
+   disk was mounted are not restored automatically.
+
+The upload endpoint saves files to `UPLOADS_DIR`, and `/uploads/<filename>`
+serves them from that same directory. If `UPLOADS_DIR` is not set, local
+development uses the repository's `uploads/` directory.
+
 ## Register customer
 
 ```json

@@ -2,8 +2,7 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 const crypto = require("crypto");
-
-const uploadDir = path.join(__dirname, "../uploads");
+const uploadDir = require("../config/uploadStorage");
 
 // Create uploads folder if it does not exist
 if (!fs.existsSync(uploadDir)) {
