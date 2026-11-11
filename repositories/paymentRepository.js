@@ -4,6 +4,13 @@ const createPayment = async (data) => {
   return await Payment.create(data);
 };
 
+const findAllPayments = async () => {
+  return await Payment.find()
+    .populate("booking")
+    .populate("customer", "name email")
+    .sort({ createdAt: -1 });
+};
+
 const findByOrderId = async (orderId) => {
   return await Payment.findOne({ razorpayOrderId: orderId });
 };
@@ -32,6 +39,7 @@ const updatePayment = async (id, data) => {
 
 module.exports = {
   createPayment,
+  findAllPayments,
   findByOrderId,
   findByBookingAndStatus,
   findByPaymentId,

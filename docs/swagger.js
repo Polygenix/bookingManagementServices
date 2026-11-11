@@ -1706,7 +1706,30 @@ const swaggerSpec = {
   },
     },
 
-    "/api/customer/reports": {
+  "/api/admin/fetchAllPayment": {
+    get: {
+      tags: ["Admin Payments"],
+      summary: "Fetch all payments",
+      description: "Admin can fetch all payments with their booking and customer details.",
+      security: [{ BearerAuth: [] }],
+      responses: {
+        200: {
+          description: "All payments fetched successfully",
+        },
+        401: {
+          description: "Unauthorized",
+        },
+        403: {
+          description: "Admin access required",
+        },
+        500: {
+          description: "Internal server error",
+        },
+      },
+    },
+  },
+
+  "/api/customer/reports": {
       get: {
         tags: ["Customer Reports"],
         summary: "Fetch reports for the authenticated customer",

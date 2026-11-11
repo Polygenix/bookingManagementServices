@@ -2,6 +2,24 @@ const paymentService = require("../services/paymentService");
 
 const getCustomerId = (req) => req.user.id || req.user._id;
 
+const getAllPayments = async (req, res) => {
+  try {
+    const payments = await paymentService.getAllPayments();
+
+    return res.status(200).json({
+      success: true,
+      message: "All payments fetched successfully",
+      count: payments.length,
+      data: payments
+    });
+  } catch (error) {
+    return res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message || "Internal server error"
+    });
+  }
+};
+
 const createOrder = async (req, res) => {
   try {
     const result = await paymentService.createOrder(
@@ -63,6 +81,7 @@ const getPaymentById = async (req, res) => {
 };
 
 module.exports = {
+  getAllPayments,
   createOrder,
   verifyPayment,
   getPaymentById

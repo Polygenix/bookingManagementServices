@@ -11,6 +11,10 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET
 });
 
+const getAllPayments = async () => {
+  return await paymentRepository.findAllPayments();
+};
+
 const createOrder = async (bookingId, customerId) => {
   if (!mongoose.Types.ObjectId.isValid(bookingId)) {
     const error = new Error("Invalid booking ID");
@@ -236,6 +240,7 @@ const getPaymentById = async (paymentId, customerId) => {
 };
 
 module.exports = {
+  getAllPayments,
   createOrder,
   verifyPayment,
   getPaymentById

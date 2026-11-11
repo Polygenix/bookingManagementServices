@@ -3,6 +3,7 @@ const router = express.Router();
 
 const adminController = require("../controllers/adminController");
 const reportController = require("../controllers/reportController");
+const paymentController = require("../controllers/paymentController");
 
 const {
   authenticate,
@@ -46,6 +47,12 @@ router.get(
   authenticate,
   authorize("admin"),
   reportController.getAllReports
+);
+router.get(
+  "/fetchAllPayment",
+  authenticate,
+  authorize("admin"),
+  paymentController.getAllPayments
 );
 
 module.exports = router;
