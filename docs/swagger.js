@@ -1707,48 +1707,48 @@ const swaggerSpec = {
   },
     },
 
-  "/api/admin/fetchAllPayment": {
-    get: {
-      tags: ["Admin Payments"],
-      summary: "Fetch all payments",
-      description: "Admin can fetch all payments with their booking and customer details.",
-      security: [{ BearerAuth: [] }],
-      responses: {
-        200: {
-          description: "All payments fetched successfully",
-        },
-        401: {
-          description: "Unauthorized",
-        },
-        403: {
-          description: "Admin access required",
-        },
-        500: {
-          description: "Internal server error",
-        },
-      },
-    },
-  },
-
-  "/api/customer/reports": {
+    "/api/admin/fetchAllPayment": {
       get: {
-        tags: ["Customer Reports"],
-        summary: "Fetch reports for the authenticated customer",
-        description: "Returns reports linked only to the authenticated customer's bookings.",
+        tags: ["Admin Payments"],
+        summary: "Fetch all payments",
+        description: "Admin can fetch all payments with their booking and customer details.",
         security: [{ BearerAuth: [] }],
         responses: {
           200: {
-            description: "Customer reports fetched successfully",
+            description: "All payments fetched successfully",
           },
           401: {
             description: "Unauthorized",
           },
           403: {
-            description: "Customer access required",
+            description: "Admin access required",
+          },
+          500: {
+            description: "Internal server error",
           },
         },
       },
     },
+
+    "/api/customer/reports": {
+        get: {
+          tags: ["Customer Reports"],
+          summary: "Fetch reports for the authenticated customer",
+          description: "Returns reports linked only to the authenticated customer's bookings.",
+          security: [{ BearerAuth: [] }],
+          responses: {
+            200: {
+              description: "Customer reports fetched successfully",
+            },
+            401: {
+              description: "Unauthorized",
+            },
+            403: {
+              description: "Customer access required",
+            },
+          },
+        },
+      },
     
     "/api/admin/deleteReports/{reportId}": {
   delete: {
@@ -1784,6 +1784,127 @@ const swaggerSpec = {
       },
       404: {
         description: "Report not found",
+      },
+    },
+  },
+    },
+
+    //========================================= 
+      //admin customer APIs
+    //=========================================
+    "/api/admin/fetchAllCustomers": {
+  get: {
+    tags: ["Admin Customer"],
+    summary: "Fetch All Customers",
+    description: "Admin can fetch all registered customers with pagination and search.",
+    security: [
+      {
+        BearerAuth: [],
+      },
+    ],
+    parameters: [
+      {
+        in: "query",
+        name: "page",
+        schema: {
+          type: "integer",
+          default: 1,
+          minimum: 1,
+        },
+        description: "Page number",
+      },
+      {
+        in: "query",
+        name: "limit",
+        schema: {
+          type: "integer",
+          default: 10,
+          minimum: 1,
+          maximum: 100,
+        },
+        description: "Number of customers per page",
+      },
+      {
+        in: "query",
+        name: "search",
+        schema: {
+          type: "string",
+        },
+        description: "Search customer by name, email or phone",
+      },
+    ],
+    responses: {
+      200: {
+        description: "Customers fetched successfully",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                success: {
+                  type: "boolean",
+                  example: true,
+                },
+                message: {
+                  type: "string",
+                  example: "Customers fetched successfully",
+                },
+                data: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      _id: {
+                        type: "string",
+                        example: "673abc123456789012345678",
+                      },
+                      name: {
+                        type: "string",
+                        example: "Ankit",
+                      },
+                      email: {
+                        type: "string",
+                        example: "ankit@example.com",
+                      },
+                      phone: {
+                        type: "string",
+                        example: "9876543210",
+                      },
+                      role: {
+                        type: "string",
+                        example: "customer",
+                      },
+                    },
+                  },
+                },
+                pagination: {
+                  type: "object",
+                  properties: {
+                    totalCustomers: {
+                      type: "integer",
+                      example: 25,
+                    },
+                    currentPage: {
+                      type: "integer",
+                      example: 1,
+                    },
+                    totalPages: {
+                      type: "integer",
+                      example: 3,
+                    },
+                    limit: {
+                      type: "integer",
+                      example: 10,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      500: {
+        description: "Internal server error",
       },
     },
   },
