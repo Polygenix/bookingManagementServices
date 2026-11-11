@@ -10,7 +10,6 @@ const adminRoutes = require("./routes/adminRoutes");
 
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./docs/swagger");
-const uploadDir = require("./config/uploadStorage");
 const testRoutes = require("./routes/testRoutes");
 const customerTestRoutes = require("./routes/customerTestRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
@@ -24,13 +23,13 @@ const customerReportRoutes = require("./routes/customerReportRoutes");
 
 
 
+
 const uploadRoutes = require("./routes/uploadRoutes");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use("/uploads", express.static(uploadDir));
 app.use("/api/common/upload", uploadRoutes);
 app.use("/api/customer/payments", paymentRoutes);
 app.use("/api/admin/time-slots", timeSlotRoutes);

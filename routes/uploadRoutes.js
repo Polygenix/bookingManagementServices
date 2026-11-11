@@ -1,9 +1,11 @@
+
 const express = require("express");
 const router = express.Router();
 
 const upload = require("../middleware/uploadMiddleware");
 const uploadController = require("../controllers/uploadController");
 
+// UPLOAD FILE
 router.post(
   "/",
   (req, res, next) => {
@@ -22,6 +24,12 @@ router.post(
     });
   },
   uploadController.uploadFile
+);
+
+// GET FILE
+router.get(
+  "/:fileId",
+  uploadController.getFile
 );
 
 module.exports = router;
