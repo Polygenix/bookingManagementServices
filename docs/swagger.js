@@ -1912,7 +1912,7 @@ const swaggerSpec = {
     },
 
     "/api/admin/fetchCustomerById/{customerId}": {
-  get: {
+    get: {
     tags: ["Admin Customer"],
     summary: "Fetch Customer By ID",
     description: "Fetch customer details using customer ID",
@@ -1947,7 +1947,73 @@ const swaggerSpec = {
       },
     },
   },
-},
+    },
+
+    "/api/admin/updateCustomer/{customerId}": {
+    put: {
+    tags: ["Admin Customer"],
+    summary: "Update Customer",
+    description: "Admin can update customer profile details",
+    security: [
+      {
+        BearerAuth: [],
+      },
+    ],
+    parameters: [
+      {
+        in: "path",
+        name: "customerId",
+        required: true,
+        schema: {
+          type: "string",
+        },
+        description: "Customer MongoDB ID",
+      },
+    ],
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              name: {
+                type: "string",
+                example: "Ankit Sharma",
+              },
+              email: {
+                type: "string",
+                example: "ankit@gmail.com",
+              },
+              phone: {
+                type: "string",
+                example: "9876543210",
+              },
+            },
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: "Customer updated successfully",
+      },
+      400: {
+        description: "Invalid customer ID",
+      },
+      404: {
+        description: "Customer not found",
+      },
+      409: {
+        description: "Email or phone already exists",
+      },
+      500: {
+        description: "Internal server error",
+      },
+    },
+  },
+    },
+    
   },
 };
 

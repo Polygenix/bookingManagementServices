@@ -13,4 +13,9 @@ router.get(
   adminCustomerController.fetchCustomerById
 );
 
+router.put(
+  "/updateCustomer/:customerId",
+  adminCustomerController.updateCustomer
+);
+
 module.exports = router;

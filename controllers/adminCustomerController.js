@@ -96,7 +96,65 @@ const fetchCustomerById = async (req, res) => {
   }
 };
 
+// Update Customer
+const updateCustomer = async (req, res) => {
+  try {
+    const { customerId } = req.params;
+    const { name, email, phone } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(customerId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid customer ID",
+      });
+    }
+
+    const customer = await User.findOne({
+      _id: customerId,
+      role: "customer",
+    });
+
+    if (!customer) {
+      return res.status(404).json({
+        success: false,
+        message: "Customer not found",
+      });
+    }
+
+    if (name !== undefined) customer.name = name;
+    if (email !== undefined) customer.email = email;
+    if (phone !== undefined) customer.phone = phone;
+
+    await customer.save();
+
+    const updatedCustomer = await User.findById(customerId)
+      .select("-password");
+
+    return res.status(200).json({
+      success: true,
+      message: "Customer updated successfully",
+      data: updatedCustomer,
+    });
+  } catch (error) {
+    console.error("Update Customer Error:", error);
+
+    if (error.code === 11000) {
+      return res.status(409).json({
+        success: false,
+        message: "Email or phone already exists",
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to update customer",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   fetchAllCustomers,
   fetchCustomerById,
+  updateCustomer,
 };
