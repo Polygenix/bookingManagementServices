@@ -8,4 +8,9 @@ router.get(
   adminCustomerController.fetchAllCustomers
 );
 
+router.get(
+  "/fetchCustomerById/:customerId",
+  adminCustomerController.fetchCustomerById
+);
+
 module.exports = router;

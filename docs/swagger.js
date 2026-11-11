@@ -1688,7 +1688,7 @@ const swaggerSpec = {
     },
 
     "/api/admin/fetchAllReports": {
-  get: {
+    get: {
     tags: ["Admin Reports"],
     summary: "Fetch all reports",
     description: "Admin can fetch all uploaded reports",
@@ -1751,7 +1751,7 @@ const swaggerSpec = {
       },
     
     "/api/admin/deleteReports/{reportId}": {
-  delete: {
+    delete: {
     tags: ["Admin Reports"],
     summary: "Delete report",
     security: [
@@ -1910,6 +1910,44 @@ const swaggerSpec = {
     },
   },
     },
+
+    "/api/admin/fetchCustomerById/{customerId}": {
+  get: {
+    tags: ["Admin Customer"],
+    summary: "Fetch Customer By ID",
+    description: "Fetch customer details using customer ID",
+    security: [
+      {
+        BearerAuth: [],
+      },
+    ],
+    parameters: [
+      {
+        in: "path",
+        name: "customerId",
+        required: true,
+        schema: {
+          type: "string",
+        },
+        description: "Customer MongoDB ID",
+      },
+    ],
+    responses: {
+      200: {
+        description: "Customer fetched successfully",
+      },
+      400: {
+        description: "Invalid customer ID",
+      },
+      404: {
+        description: "Customer not found",
+      },
+      500: {
+        description: "Internal server error",
+      },
+    },
+  },
+},
   },
 };
 
