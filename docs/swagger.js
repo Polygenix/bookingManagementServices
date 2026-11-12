@@ -942,7 +942,7 @@ const swaggerSpec = {
         tags: ["Customer Payment"],
         summary: "Create Razorpay Order",
         operationId: "createPaymentOrder",
-        description: "Create a Razorpay order for a customer booking",
+        description: "Create a Razorpay order for a customer booking. The returned order amount is in paise, as required by Razorpay.",
         security: [{ BearerAuth: [] }],
 
         requestBody: {
@@ -994,7 +994,7 @@ const swaggerSpec = {
         tags: ["Customer Payment"],
         summary: "Verify Payment",
         operationId: "verifyPayment",
-        description: "Verify Razorpay payment signature and captured payment",
+        description: "Verify Razorpay payment signature and captured payment. Payment response amounts are in rupees.",
         security: [{ BearerAuth: [] }],
 
         requestBody: {
@@ -1055,7 +1055,7 @@ const swaggerSpec = {
         tags: ["Customer Payment"],
         summary: "Get Payment Details",
         operationId: "getPaymentDetails",
-        description: "Get payment details by payment ID",
+        description: "Get payment details by payment ID. The payment amount is in rupees.",
         security: [{ BearerAuth: [] }],
 
         parameters: [
@@ -1711,7 +1711,7 @@ const swaggerSpec = {
       get: {
         tags: ["Admin Payments"],
         summary: "Fetch all payments",
-        description: "Admin can fetch all payments with their booking and customer details.",
+        description: "Admin can fetch all payments with their booking and customer details. Payment amounts are in rupees.",
         security: [{ BearerAuth: [] }],
         responses: {
           200: {

@@ -2,6 +2,15 @@ const paymentService = require("../services/paymentService");
 
 const getCustomerId = (req) => req.user.id || req.user._id;
 
+const formatPaymentResponse = (payment) => {
+  const paymentData = payment.toObject();
+
+  return {
+    ...paymentData,
+    amount: paymentData.amount / 100
+  };
+};
+
 const getAllPayments = async (req, res) => {
   try {
     const payments = await paymentService.getAllPayments();
@@ -10,7 +19,7 @@ const getAllPayments = async (req, res) => {
       success: true,
       message: "All payments fetched successfully",
       count: payments.length,
-      data: payments
+      data: payments.map(formatPaymentResponse)
     });
   } catch (error) {
     return res.status(error.statusCode || 500).json({
@@ -50,7 +59,7 @@ const verifyPayment = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Payment verified successfully",
-      data: payment
+      data: formatPaymentResponse(payment)
     });
   } catch (error) {
     return res.status(error.statusCode || 500).json({
@@ -70,7 +79,7 @@ const getPaymentById = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Payment details fetched successfully",
-      data: payment
+      data: formatPaymentResponse(payment)
     });
   } catch (error) {
     return res.status(error.statusCode || 500).json({
