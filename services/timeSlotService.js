@@ -142,10 +142,6 @@ const deleteTimeSlot = async (id) => {
     throwError("Time slot not found", 404);
   }
 
-  if (slot.bookedCount > 0) {
-    throwError("Cannot delete time slot with existing bookings", 400);
-  }
-
   return await timeSlotRepository.deleteTimeSlot(id);
 };
 
