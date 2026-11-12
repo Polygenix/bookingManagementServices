@@ -15,19 +15,9 @@ const findBookingById = async (id) => {
     .populate("addressId");
 };
 
-const updateBooking = async (id, updateData, requirePaymentUnlocked = false) => {
-  const filter = { _id: id };
-
-  if (requirePaymentUnlocked) {
-    filter.$or = [
-      { paymentOrderLockUntil: { $exists: false } },
-      { paymentOrderLockUntil: null },
-      { paymentOrderLockUntil: { $lte: new Date() } },
-    ];
-  }
-
-  return await Booking.findOneAndUpdate(
-    filter,
+const updateBooking = async (id, updateData) => {
+  return await Booking.findByIdAndUpdate(
+    id,
     { $set: updateData },
     {
       new: true,

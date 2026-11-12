@@ -90,16 +90,6 @@ const bookingSchema = new mongoose.Schema(
       enum: ["pending", "confirmed", "cancelled", "completed"],
       default: "pending",
     },
-
-    paymentOrderLockToken: {
-      type: String,
-      select: false,
-    },
-
-    paymentOrderLockUntil: {
-      type: Date,
-      select: false,
-    },
   },
   {
     timestamps: true,
