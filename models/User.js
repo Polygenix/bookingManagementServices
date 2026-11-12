@@ -28,6 +28,17 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["admin", "customer"],
       required: [true, "Role is required"]
+    },
+
+    isActive: {
+      type: Boolean,
+      default: true
+    },
+
+    addressRevision: {
+      type: Number,
+      default: 0,
+      select: false
     }
   },
   { timestamps: true }

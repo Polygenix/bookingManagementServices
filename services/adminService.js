@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const Booking = require("../models/Booking");
 const TimeSlot = require("../models/TimeSlot");
 const Test = require("../models/Test");
+const Payment = require("../models/Payment");
 
 // Release reserved slot capacity
 const releaseSlotCapacity = async (booking, session) => {
@@ -26,6 +27,28 @@ const releaseSlotCapacity = async (booking, session) => {
 
   if (result.modifiedCount !== 1) {
     const error = new Error("Unable to release time slot capacity");
+    error.statusCode = 409;
+    throw error;
+  }
+};
+
+const reserveSlotCapacity = async (booking, session) => {
+  if (!booking.timeSlotId) {
+    return;
+  }
+
+  const result = await TimeSlot.updateOne(
+    {
+      _id: booking.timeSlotId,
+      isActive: true,
+      $expr: { $lt: ["$bookedCount", "$capacity"] }
+    },
+    { $inc: { bookedCount: 1 } },
+    { session }
+  );
+
+  if (result.modifiedCount !== 1) {
+    const error = new Error("Unable to reserve time slot capacity");
     error.statusCode = 409;
     throw error;
   }
@@ -82,7 +105,9 @@ const updateBookingStatus = async (id, status) => {
 
   try {
     await session.withTransaction(async () => {
-      const booking = await Booking.findById(id).session(session);
+      const booking = await Booking.findById(id)
+        .select("+paymentOrderLockUntil")
+        .session(session);
 
       if (!booking) {
         const error = new Error("Booking not found");
@@ -90,14 +115,51 @@ const updateBookingStatus = async (id, status) => {
         throw error;
       }
 
-      // Release capacity only once when booking is cancelled.
-      // Completed bookings do not release historical capacity.
+      const transitions = {
+        pending: ["confirmed", "cancelled"],
+        confirmed: ["completed", "cancelled"],
+        cancelled: ["pending", "confirmed"],
+        completed: []
+      };
+
+      if (
+        status !== booking.status &&
+        !transitions[booking.status]?.includes(status)
+      ) {
+        const error = new Error(
+          `Booking cannot transition from ${booking.status} to ${status}`
+        );
+        error.statusCode = 409;
+        throw error;
+      }
+
+      if (status === "cancelled" && booking.status !== "cancelled") {
+        const activePayment = await Payment.exists({
+          booking: booking._id,
+          status: { $in: ["pending", "paid"] }
+        }).session(session);
+
+        if (activePayment || booking.paymentOrderLockUntil > new Date()) {
+          const error = new Error(
+            "Resolve the booking payment before cancelling it"
+          );
+          error.statusCode = 409;
+          throw error;
+        }
+      }
+
       if (
         status === "cancelled" &&
-        booking.status !== "cancelled" &&
-        booking.status !== "completed"
+        booking.status !== "cancelled"
       ) {
         await releaseSlotCapacity(booking, session);
+      }
+
+      if (
+        booking.status === "cancelled" &&
+        ["pending", "confirmed"].includes(status)
+      ) {
+        await reserveSlotCapacity(booking, session);
       }
 
       updatedBooking = await Booking.findByIdAndUpdate(
@@ -145,6 +207,19 @@ const updateBooking = async (id, data) => {
   });
 
   if (updateData.testId !== undefined || updateData.testName !== undefined) {
+    const activePayment = await Payment.exists({
+      booking: id,
+      status: { $in: ["pending", "paid"] }
+    });
+
+    if (activePayment) {
+      const error = new Error(
+        "The test cannot be changed while a payment is pending or paid"
+      );
+      error.statusCode = 409;
+      throw error;
+    }
+
     let test;
 
     if (updateData.testId !== undefined) {
@@ -188,9 +263,27 @@ const updateBooking = async (id, data) => {
     throw error;
   }
 
-  const booking = await adminRepository.updateBooking(id, updateData);
+  const booking = await adminRepository.updateBooking(
+    id,
+    updateData,
+    updateData.testId !== undefined || updateData.testName !== undefined
+  );
 
   if (!booking) {
+    if (
+      updateData.testId !== undefined ||
+      updateData.testName !== undefined
+    ) {
+      const existingBooking = await Booking.exists({ _id: id });
+      if (existingBooking) {
+        const error = new Error(
+          "Booking test cannot be changed in its current state"
+        );
+        error.statusCode = 409;
+        throw error;
+      }
+    }
+
     const error = new Error("Booking not found");
     error.statusCode = 404;
     throw error;
@@ -213,11 +306,26 @@ const deleteBooking = async (id) => {
 
   try {
     await session.withTransaction(async () => {
-      const booking = await Booking.findById(id).session(session);
+      const booking = await Booking.findById(id)
+        .select("+paymentOrderLockUntil")
+        .session(session);
 
       if (!booking) {
         const error = new Error("Booking not found");
         error.statusCode = 404;
+        throw error;
+      }
+
+      const activePayment = await Payment.exists({
+        booking: booking._id,
+        status: { $in: ["pending", "paid"] }
+      }).session(session);
+
+      if (activePayment || booking.paymentOrderLockUntil > new Date()) {
+        const error = new Error(
+          "Resolve the booking payment before deleting it"
+        );
+        error.statusCode = 409;
         throw error;
       }
 

@@ -5,6 +5,7 @@ const bookingRepository = require("../repositories/bookingRepository");
 const TimeSlot = require("../models/TimeSlot");
 const Address = require("../models/Address");
 const Test = require("../models/Test");
+const Payment = require("../models/Payment");
 
 const throwError = (message, statusCode) => {
   const error = new Error(message);
@@ -83,18 +84,20 @@ const createBooking = async (customerId, data) => {
 
   const selectedDate = new Date(bookingDate);
 
-  if (Number.isNaN(selectedDate.getTime())) {
+  if (
+    typeof bookingDate !== "string" ||
+    !/^\d{4}-\d{2}-\d{2}$/.test(bookingDate) ||
+    Number.isNaN(selectedDate.getTime()) ||
+    selectedDate.toISOString().slice(0, 10) !== bookingDate
+  ) {
     throwError("Invalid booking date", 400);
   }
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const slotDate = bookingDate;
+  const normalizedBookingDate = new Date(`${slotDate}T00:00:00.000Z`);
+  const today = new Date().toISOString().slice(0, 10);
 
-  const normalizedBookingDate = new Date(selectedDate);
-  normalizedBookingDate.setHours(0, 0, 0, 0);
-  const slotDate = selectedDate.toISOString().slice(0, 10);
-
-  if (normalizedBookingDate < today) {
+  if (slotDate < today) {
     throwError("Booking date cannot be in the past", 400);
   }
 
@@ -218,6 +221,24 @@ const updateCustomerBooking = async (bookingId, customerId, data) => {
     }
   }
 
+  if (updateData.patientName !== undefined && (
+    typeof updateData.patientName !== "string" ||
+    !updateData.patientName.trim()
+  )) {
+    throwError("Patient name must be a non-empty string", 400);
+  }
+
+  if (updateData.phone !== undefined && (
+    typeof updateData.phone !== "string" ||
+    !updateData.phone.trim()
+  )) {
+    throwError("Phone must be a non-empty string", 400);
+  }
+
+  if (updateData.notes !== undefined && typeof updateData.notes !== "string") {
+    throwError("Notes must be a string", 400);
+  }
+
   if (updateData.age !== undefined) {
     if (
       !Number.isInteger(Number(updateData.age)) ||
@@ -246,6 +267,18 @@ const updateCustomerBooking = async (bookingId, customerId, data) => {
   }
 
   if (updateData.testId !== undefined || updateData.testName !== undefined) {
+    const activePayment = await Payment.exists({
+      booking: bookingId,
+      status: { $in: ["pending", "paid"] }
+    });
+
+    if (activePayment) {
+      throwError(
+        "The test cannot be changed while a payment is pending or paid",
+        409
+      );
+    }
+
     let test;
 
     if (updateData.testId !== undefined) {
@@ -280,10 +313,22 @@ const updateCustomerBooking = async (bookingId, customerId, data) => {
   const booking = await bookingRepository.updateBooking(
     bookingId,
     customerId,
-    updateData
+    updateData,
+    updateData.testId !== undefined || updateData.testName !== undefined
   );
 
   if (!booking) {
+    if (updateData.testId !== undefined || updateData.testName !== undefined) {
+      const existingBooking = await bookingRepository.findBookingById(
+        bookingId,
+        customerId
+      );
+
+      if (existingBooking) {
+        throwError("Booking test cannot be changed in its current state", 409);
+      }
+    }
+
     throwError("Booking not found", 404);
   }
 
@@ -294,6 +339,18 @@ const updateCustomerBooking = async (bookingId, customerId, data) => {
 const deleteCustomerBooking = async (bookingId, customerId) => {
   if (!mongoose.Types.ObjectId.isValid(bookingId)) {
     throwError("Invalid booking ID", 400);
+  }
+
+  const activePayment = await Payment.exists({
+    booking: bookingId,
+    status: { $in: ["pending", "paid"] }
+  });
+
+  if (activePayment) {
+    throwError(
+      "Bookings with a pending or paid payment cannot be deleted",
+      409
+    );
   }
 
   const booking = await bookingRepository.deleteBooking(

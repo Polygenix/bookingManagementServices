@@ -1,8 +1,9 @@
 
 const Address = require("../models/Address");
 
-const createAddress = async (data) => {
-  return await Address.create(data);
+const createAddress = async (data, session) => {
+  const address = new Address(data);
+  return await address.save({ session });
 };
 
 const getAllAddresses = async (customerId) => {
@@ -25,30 +26,37 @@ const updateAddress = async (id, customerId, data) => {
   );
 };
 
-const deleteAddress = async (id, customerId) => {
+const deleteAddress = async (id, customerId, session) => {
   return await Address.findOneAndDelete({
     _id: id,
     customer: customerId
-  });
+  }, { session });
 };
 
-const clearDefaultAddress = async (customerId) => {
+const clearDefaultAddress = async (customerId, session) => {
   return await Address.updateMany(
     { customer: customerId },
-    { $set: { isDefault: false } }
+    { $set: { isDefault: false } },
+    { session }
   );
 };
 
-const getAddressCount = async (customerId) => {
-  return await Address.countDocuments({ customer: customerId });
+const getAddressCount = async (customerId, session) => {
+  return await Address.countDocuments({ customer: customerId }).session(session);
 };
 
-const setDefaultAddress = async (id, customerId) => {
+const setDefaultAddress = async (id, customerId, session) => {
   return await Address.findOneAndUpdate(
     { _id: id, customer: customerId },
     { $set: { isDefault: true } },
-    { new: true }
+    { new: true, session }
   );
+};
+
+const findMostRecentAddress = async (customerId, session) => {
+  return await Address.findOne({ customer: customerId })
+    .sort({ createdAt: -1 })
+    .session(session);
 };
 
 module.exports = {
@@ -59,5 +67,6 @@ module.exports = {
   deleteAddress,
   clearDefaultAddress,
   getAddressCount,
-  setDefaultAddress
+  setDefaultAddress,
+  findMostRecentAddress
 };

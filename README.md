@@ -11,7 +11,7 @@ Both roles use the **same two endpoints**:
 2. Copy `.env.example` to `.env`
 3. Set `MONGO_URI` and a strong `JWT_SECRET`
 4. Run `npm run dev`
-5. Open `http://localhost:5002/api-docs/`
+5. Open `http://localhost:5002/BookingManagementServices`
 
 ## Persistent uploads on Render
 
