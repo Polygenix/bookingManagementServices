@@ -1,118 +1,204 @@
-const crypto = require("crypto");
-const axios = require("axios");
 
+const crypto = require("crypto");
+const nodemailer = require("nodemailer");
 const otpRepository = require("../repositories/otpRepository");
 
-const OTP_EXPIRY = 5 * 60 * 1000;
-const RESEND_COOLDOWN = 60 * 1000;
+const OTP_EXPIRY_MINUTES = 5;
+const RESEND_COOLDOWN_SECONDS = 60;
+const MAX_VERIFY_ATTEMPTS = 5;
 
-const normalizePhone = (phone) => {
-  const value = String(phone || "").replace(/[\s-]/g, "");
+const getConfig = () => {
+  const required = [
+    "OTP_SECRET",
+    "SMTP_HOST",
+    "SMTP_PORT",
+    "SMTP_USER",
+    "SMTP_PASS",
+    "SMTP_FROM",
+  ];
 
-  let normalized;
+  for (const key of required) {
+    if (!process.env[key]) {
+      throw new Error(`Missing environment variable: ${key}`);
+    }
+  }
 
-  if (/^[6-9]\d{9}$/.test(value)) {
-    normalized = `91${value}`;
-  } else if (/^91[6-9]\d{9}$/.test(value)) {
-    normalized = value;
-  } else if (/^\+91[6-9]\d{9}$/.test(value)) {
-    normalized = value.substring(1);
-  } else {
-    throw new Error("Please enter a valid Indian phone number");
+  if (process.env.OTP_SECRET.length < 32) {
+    throw new Error("OTP_SECRET must be at least 32 characters");
+  }
+};
+
+const transporter = () => {
+  getConfig();
+
+  return nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT),
+    secure: process.env.SMTP_SECURE === "true",
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
+  });
+};
+
+const normalizeEmail = (email) => {
+  if (typeof email !== "string") {
+    throw new Error("Invalid email address");
+  }
+
+  const normalized = email.trim().toLowerCase();
+
+  if (
+    normalized.length > 254 ||
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized)
+  ) {
+    throw new Error("Invalid email address");
   }
 
   return normalized;
 };
 
-const generateOtp = () => {
-  return crypto.randomInt(100000, 1000000).toString();
-};
+const generateOtp = () =>
+  crypto.randomInt(100000, 1000000).toString();
 
-const hashOtp = (phone, otp) => {
-  if (!process.env.OTP_SECRET || process.env.OTP_SECRET.length < 32) {
-    throw new Error("OTP_SECRET must be at least 32 characters");
-  }
-
-  return crypto
+const hashOtp = (otp) =>
+  crypto
     .createHmac("sha256", process.env.OTP_SECRET)
-    .update(`${phone}:${otp}`)
+    .update(otp)
     .digest("hex");
+
+const sendEmail = async (email, otp) => {
+  const mailer = transporter();
+
+  await mailer.sendMail({
+    from: process.env.SMTP_FROM,
+    to: email,
+    subject: "Your Booking Verification OTP",
+    text: `Your Booking OTP is ${otp}. It is valid for 5 minutes. Do not share it with anyone.`,
+    html: `
+      <div style="font-family:Arial,sans-serif;max-width:500px;margin:auto;padding:24px">
+        <h2>Booking Email Verification</h2>
+        <p>Your verification OTP is:</p>
+        <h1 style="letter-spacing:8px">${otp}</h1>
+        <p>This OTP is valid for 5 minutes.</p>
+        <p>Do not share this OTP with anyone.</p>
+      </div>
+    `,
+  });
 };
 
-const sendSms = async (phone, otp) => {
-  const {
-    MSG91_AUTH_KEY,
-    MSG91_TEMPLATE_ID,
-    MSG91_SENDER_ID,
-  } = process.env;
+const sendOtp = async (email) => {
+  getConfig();
 
-  if (!MSG91_AUTH_KEY || !MSG91_TEMPLATE_ID || !MSG91_SENDER_ID) {
-    throw new Error("MSG91 configuration is missing");
-  }
-
-  const response = await axios.post(
-    "https://control.msg91.com/api/v5/flow/",
-    {
-      template_id: MSG91_TEMPLATE_ID,
-      sender: MSG91_SENDER_ID,
-      short_url: "0",
-      mobiles: phone,
-      var1: otp,
-    },
-    {
-      headers: {
-        authkey: MSG91_AUTH_KEY,
-        "Content-Type": "application/json",
-      },
-      timeout: 10000,
-    }
-  );
-
-  return response.data;
-};
-
-const sendOtp = async (phoneNumber) => {
-  const phone = normalizePhone(phoneNumber);
+  email = normalizeEmail(email);
 
   const otp = generateOtp();
-  const otpHash = hashOtp(phone, otp);
+  const otpHash = hashOtp(otp);
 
-  const now = Date.now();
-
-  const expiresAt = new Date(now + OTP_EXPIRY);
-  const resendAvailableAt = new Date(now + RESEND_COOLDOWN);
+  const now = new Date();
+  const expiresAt = new Date(
+    now.getTime() + OTP_EXPIRY_MINUTES * 60 * 1000
+  );
+  const resendAvailableAt = new Date(
+    now.getTime() + RESEND_COOLDOWN_SECONDS * 1000
+  );
 
   try {
     await otpRepository.saveOtp(
-      phone,
+      email,
       otpHash,
       expiresAt,
       resendAvailableAt
     );
   } catch (error) {
     if (error.code === 11000) {
-      throw new Error("Please wait 60 seconds before requesting another OTP");
+      const existing = await otpRepository.findByEmail(email);
+
+      if (existing && existing.resendAvailableAt > new Date()) {
+        const seconds = Math.ceil(
+          (existing.resendAvailableAt - new Date()) / 1000
+        );
+
+        throw new Error(`Please wait ${seconds} seconds before requesting another OTP`);
+      }
     }
 
     throw error;
   }
 
   try {
-    await sendSms(phone, otp);
+    await sendEmail(email, otp);
   } catch (error) {
-    // Remove only this request's OTP if the SMS provider fails.
-    await otpRepository.deleteOtp(phone, otpHash);
-
-    throw new Error("Unable to send OTP. Please try again");
+    await otpRepository.deleteOtp(email, otpHash);
+    throw new Error("Unable to send OTP email. Please try again.");
   }
 
   return {
-    phone: `+${phone}`,
-    expiresIn: 300,
-    resendAfter: 60,
+    email,
+    expiresIn: OTP_EXPIRY_MINUTES * 60,
+    resendAfter: RESEND_COOLDOWN_SECONDS,
+  };
+};
+
+const verifyOtp = async (email, otp) => {
+  getConfig();
+
+  email = normalizeEmail(email);
+
+  if (typeof otp !== "string" || !/^\d{6}$/.test(otp)) {
+    throw new Error("Invalid OTP");
+  }
+
+  const record = await otpRepository.findByEmail(email);
+
+  if (!record) {
+    throw new Error("OTP not found or expired");
+  }
+
+  if (record.expiresAt <= new Date()) {
+    await otpRepository.deleteOtp(email, record.otpHash);
+    throw new Error("OTP expired");
+  }
+
+  if (record.attempts >= MAX_VERIFY_ATTEMPTS) {
+    await otpRepository.deleteOtp(email, record.otpHash);
+    throw new Error("Maximum OTP attempts exceeded. Request a new OTP.");
+  }
+
+  const submittedHash = Buffer.from(hashOtp(otp), "hex");
+  const storedHash = Buffer.from(record.otpHash, "hex");
+
+  if (
+    submittedHash.length !== storedHash.length ||
+    !crypto.timingSafeEqual(submittedHash, storedHash)
+  ) {
+    const updated = await otpRepository.incrementAttempts(email);
+
+    if (updated && updated.attempts >= MAX_VERIFY_ATTEMPTS) {
+      await otpRepository.deleteOtp(email, record.otpHash);
+      throw new Error("Maximum OTP attempts exceeded. Request a new OTP.");
+    }
+
+    throw new Error("Incorrect OTP");
+  }
+
+  const deleted = await otpRepository.deleteOtp(email, record.otpHash);
+
+  if (deleted.deletedCount !== 1) {
+    throw new Error("OTP already used or invalid");
+  }
+
+  return {
+    email,
+    verified: true,
   };
 };
 
 module.exports = {
   sendOtp,
+  verifyOtp,
 };

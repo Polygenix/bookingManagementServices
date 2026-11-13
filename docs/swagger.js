@@ -2073,84 +2073,69 @@ const swaggerSpec = {
 // OTP APIs
 // =========================================
 
+
 "/api/otp/send": {
   post: {
     tags: ["OTP"],
-    summary: "Send OTP",
-    description: "Generate and send a 6-digit OTP to the customer's mobile number.",
-
+    summary: "Send Email OTP",
     requestBody: {
       required: true,
       content: {
         "application/json": {
           schema: {
             type: "object",
-            required: ["phone"],
+            required: ["email"],
             properties: {
-              phone: {
+              email: {
                 type: "string",
-                example: "9876543210",
-                description: "Customer's 10-digit Indian mobile number",
-              },
-            },
-          },
-        },
-      },
+                example: "customer@example.com"
+              }
+            }
+          }
+        }
+      }
     },
-
     responses: {
-      200: {
-        description: "OTP sent successfully",
-        content: {
-          "application/json": {
-            schema: {
-              type: "object",
-              properties: {
-                success: {
-                  type: "boolean",
-                  example: true,
-                },
-                message: {
-                  type: "string",
-                  example: "OTP sent successfully",
-                },
-                data: {
-                  type: "object",
-                  properties: {
-                    phone: {
-                      type: "string",
-                      example: "+919876543210",
-                    },
-                    expiresIn: {
-                      type: "integer",
-                      example: 300,
-                    },
-                    resendAfter: {
-                      type: "integer",
-                      example: 60,
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-      400: {
-        description: "Phone number is missing or invalid",
-      },
-      429: {
-        description: "OTP resend cooldown active",
-      },
-      502: {
-        description: "SMS delivery failed",
-      },
-      500: {
-        description: "Server configuration error",
-      },
-    },
-  },
+      200: { description: "OTP sent successfully" },
+      400: { description: "Invalid email" },
+      429: { description: "Rate limit or resend cooldown" },
+      502: { description: "Email delivery failed" }
+    }
+  }
 },
+"/api/otp/verify": {
+  post: {
+    tags: ["OTP"],
+    summary: "Verify Email OTP",
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            required: ["email", "otp"],
+            properties: {
+              email: {
+                type: "string",
+                example: "customer@example.com"
+              },
+              otp: {
+                type: "string",
+                example: "123456"
+              }
+            }
+          }
+        }
+      }
+    },
+    responses: {
+      200: { description: "Email verified successfully" },
+      400: { description: "Invalid or expired OTP" },
+      429: { description: "Too many requests" }
+    }
+  }
+}
+
 
   },
 };

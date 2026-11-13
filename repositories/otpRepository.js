@@ -1,23 +1,22 @@
+
 const Otp = require("../models/otpModel");
 
-const findByPhone = async (phone) => {
-  return Otp.findOne({ phone }).select("+otpHash");
+const findByEmail = async (email) => {
+  return Otp.findOne({ email }).select("+otpHash");
 };
 
-const saveOtp = async (phone, otpHash, expiresAt, resendAvailableAt) => {
+const saveOtp = async (email, otpHash, expiresAt, resendAvailableAt) => {
   return Otp.findOneAndUpdate(
     {
-      phone,
-      $or: [
-        { resendAvailableAt: { $lte: new Date() } },
-        { resendAvailableAt: { $exists: false } },
-      ],
+      email,
+      resendAvailableAt: { $lte: new Date() },
     },
     {
       $set: {
         otpHash,
         expiresAt,
         resendAvailableAt,
+        attempts: 0,
       },
     },
     {
@@ -29,12 +28,21 @@ const saveOtp = async (phone, otpHash, expiresAt, resendAvailableAt) => {
   );
 };
 
-const deleteOtp = async (phone, otpHash) => {
-  return Otp.deleteOne({ phone, otpHash });
+const incrementAttempts = async (email) => {
+  return Otp.findOneAndUpdate(
+    { email },
+    { $inc: { attempts: 1 } },
+    { new: true }
+  );
+};
+
+const deleteOtp = async (email, otpHash) => {
+  return Otp.deleteOne({ email, otpHash });
 };
 
 module.exports = {
-  findByPhone,
+  findByEmail,
   saveOtp,
+  incrementAttempts,
   deleteOtp,
 };
