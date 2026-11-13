@@ -2,8 +2,9 @@ const express = require("express");
 const router = express.Router();
 
 const adminCustomerController = require("../controllers/adminCustomerController");
+const { authenticate, authorize } = require("../middleware/auth");
 
-// Use your existing admin authentication middleware here.
+router.use(authenticate, authorize("admin"));
 
 router.get(
   "/fetchAllCustomers",
