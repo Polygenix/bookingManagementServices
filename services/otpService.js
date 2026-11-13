@@ -8,16 +8,14 @@ const RESEND_COOLDOWN_SECONDS = 60;
 const MAX_VERIFY_ATTEMPTS = 5;
 
 const getConfig = () => {
-  if (process.env.RENDER && !process.env.RESEND_API_KEY) {
-    throw new Error("Missing environment variable: RESEND_API_KEY");
-  }
-
-  const required = ["JWT_SECRET"];
-  required.push(
-    ...(process.env.RESEND_API_KEY
-      ? ["EMAIL_FROM"]
-      : ["SMTP_HOST", "SMTP_PORT", "SMTP_USER", "SMTP_PASS", "SMTP_FROM"])
-  );
+  const required = [
+    "JWT_SECRET",
+    "SMTP_HOST",
+    "SMTP_PORT",
+    "SMTP_USER",
+    "SMTP_PASS",
+    "SMTP_FROM",
+  ];
 
   for (const key of required) {
     if (!process.env[key]) {
@@ -63,32 +61,6 @@ const sendEmail = async (email, otp) => {
         <p>Do not share this OTP with anyone.</p>
       </div>
     `;
-
-  if (process.env.RESEND_API_KEY) {
-    const response = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from: process.env.EMAIL_FROM,
-        to: [email],
-        subject: "Your Booking Verification OTP",
-        text,
-        html,
-      }),
-    });
-
-    if (!response.ok) {
-      const details = await response.text();
-      throw new Error(
-        `Resend email API failed with status ${response.status}: ${details}`
-      );
-    }
-
-    return;
-  }
 
   const mailer = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
