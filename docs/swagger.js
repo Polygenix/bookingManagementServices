@@ -2067,76 +2067,7 @@ const swaggerSpec = {
       },
     },
   },
-    },
-
-    // =========================================
-// OTP APIs
-// =========================================
-
-
-"/api/otp/send": {
-  post: {
-    tags: ["OTP"],
-    summary: "Send Email OTP",
-    requestBody: {
-      required: true,
-      content: {
-        "application/json": {
-          schema: {
-            type: "object",
-            required: ["email"],
-            properties: {
-              email: {
-                type: "string",
-                example: "customer@example.com"
-              }
-            }
-          }
-        }
-      }
-    },
-    responses: {
-      200: { description: "OTP sent successfully" },
-      400: { description: "Invalid email" },
-      429: { description: "Rate limit or resend cooldown" },
-      502: { description: "Email delivery failed" }
-    }
-  }
-},
-"/api/otp/verify": {
-  post: {
-    tags: ["OTP"],
-    summary: "Verify Email OTP",
-    requestBody: {
-      required: true,
-      content: {
-        "application/json": {
-          schema: {
-            type: "object",
-            required: ["email", "otp"],
-            properties: {
-              email: {
-                type: "string",
-                example: "customer@example.com"
-              },
-              otp: {
-                type: "string",
-                example: "123456"
-              }
-            }
-          }
-        }
-      }
-    },
-    responses: {
-      200: { description: "Email verified successfully" },
-      400: { description: "Invalid or expired OTP" },
-      429: { description: "Too many requests" }
-    }
-  }
-}
-
-
+  },
   },
 };
 

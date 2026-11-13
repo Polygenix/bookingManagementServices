@@ -27,14 +27,6 @@ The upload endpoint saves files to `UPLOADS_DIR`, and `/uploads/<filename>`
 serves them from that same directory. If `UPLOADS_DIR` is not set, local
 development uses the repository's `uploads/` directory.
 
-## OTP email on Render
-
-For OTP emails on Render, configure `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`,
-`SMTP_PASS`, and `SMTP_FROM` using an email provider that supports SMTP on port
-`2525`. Gmail's SMTP ports are blocked by Render. Local development can continue
-using its existing SMTP settings. OTP hashes use `JWT_SECRET`; no separate OTP
-secret is required.
-
 ## Register customer
 
 ```json

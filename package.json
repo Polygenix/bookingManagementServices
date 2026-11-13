@@ -12,11 +12,9 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.2",
-    "express-rate-limit": "^8.7.4",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^8.9.5",
     "multer": "^2.5.0",
-    "nodemailer": "^10.5.0",
     "razorpay": "^2.9.8",
     "swagger-ui-express": "^5.0.1"
   },
