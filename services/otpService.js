@@ -8,41 +8,22 @@ const RESEND_COOLDOWN_SECONDS = 60;
 const MAX_VERIFY_ATTEMPTS = 5;
 
 const getConfig = () => {
-  const required = [
-    "OTP_SECRET",
-    "SMTP_HOST",
-    "SMTP_PORT",
-    "SMTP_USER",
-    "SMTP_PASS",
-    "SMTP_FROM",
-  ];
+  if (process.env.RENDER && !process.env.RESEND_API_KEY) {
+    throw new Error("Missing environment variable: RESEND_API_KEY");
+  }
+
+  const required = ["JWT_SECRET"];
+  required.push(
+    ...(process.env.RESEND_API_KEY
+      ? ["EMAIL_FROM"]
+      : ["SMTP_HOST", "SMTP_PORT", "SMTP_USER", "SMTP_PASS", "SMTP_FROM"])
+  );
 
   for (const key of required) {
     if (!process.env[key]) {
       throw new Error(`Missing environment variable: ${key}`);
     }
   }
-
-  if (process.env.OTP_SECRET.length < 32) {
-    throw new Error("OTP_SECRET must be at least 32 characters");
-  }
-};
-
-const transporter = () => {
-  getConfig();
-
-  return nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT),
-    secure: process.env.SMTP_SECURE === "true",
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 15000,
-  });
 };
 
 const normalizeEmail = (email) => {
@@ -67,19 +48,13 @@ const generateOtp = () =>
 
 const hashOtp = (otp) =>
   crypto
-    .createHmac("sha256", process.env.OTP_SECRET)
+    .createHmac("sha256", process.env.JWT_SECRET)
     .update(otp)
     .digest("hex");
 
 const sendEmail = async (email, otp) => {
-  const mailer = transporter();
-
-  await mailer.sendMail({
-    from: process.env.SMTP_FROM,
-    to: email,
-    subject: "Your Booking Verification OTP",
-    text: `Your Booking OTP is ${otp}. It is valid for 5 minutes. Do not share it with anyone.`,
-    html: `
+  const text = `Your Booking OTP is ${otp}. It is valid for 5 minutes. Do not share it with anyone.`;
+  const html = `
       <div style="font-family:Arial,sans-serif;max-width:500px;margin:auto;padding:24px">
         <h2>Booking Email Verification</h2>
         <p>Your verification OTP is:</p>
@@ -87,7 +62,53 @@ const sendEmail = async (email, otp) => {
         <p>This OTP is valid for 5 minutes.</p>
         <p>Do not share this OTP with anyone.</p>
       </div>
-    `,
+    `;
+
+  if (process.env.RESEND_API_KEY) {
+    const response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: process.env.EMAIL_FROM,
+        to: [email],
+        subject: "Your Booking Verification OTP",
+        text,
+        html,
+      }),
+    });
+
+    if (!response.ok) {
+      const details = await response.text();
+      throw new Error(
+        `Resend email API failed with status ${response.status}: ${details}`
+      );
+    }
+
+    return;
+  }
+
+  const mailer = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT),
+    secure: process.env.SMTP_SECURE === "true",
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
+  });
+
+  await mailer.sendMail({
+    from: process.env.SMTP_FROM,
+    to: email,
+    subject: "Your Booking Verification OTP",
+    text,
+    html,
   });
 };
 
@@ -133,6 +154,7 @@ const sendOtp = async (email) => {
   try {
     await sendEmail(email, otp);
   } catch (error) {
+    console.error("OTP email delivery failed:", error.message);
     await otpRepository.deleteOtp(email, otpHash);
     throw new Error("Unable to send OTP email. Please try again.");
   }

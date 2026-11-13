@@ -26,8 +26,7 @@ const sendOtp = async (req, res) => {
       ? 429
       : message.startsWith("Invalid email")
         ? 400
-        : message.startsWith("Missing environment") ||
-          message.startsWith("OTP_SECRET")
+        : message.startsWith("Missing environment")
           ? 500
           : 502;
 
