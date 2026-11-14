@@ -164,7 +164,7 @@ const sendOtp = async (data) => {
   try {
     await sendEmail(
       email,
-      "Your Booking Management OTP",
+      "Your Booking Registration OTP",
       `<p>Your one-time password is <strong>${otp}</strong>.</p><p>It expires in 10 minutes. Do not share this code with anyone.</p>`
     );
   } catch (cause) {
