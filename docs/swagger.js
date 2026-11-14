@@ -8,18 +8,18 @@ const swaggerSpec = {
   },
 
   servers: [
-    // {
-    //   url: "http://localhost:5002",
-    //   description: "Local Server",
-    // },
+    {
+      url: "http://localhost:5002",
+      description: "Local Server",
+    },
     // {
     //   url: "https://bookingmanagementservices.onrender.com",
     //   description: "Production Server",
     // },
-    {
-      url: "https://api.devankit.co.in",
-      description: "Production Server",
-    },
+    // {
+    //   url: "https://api.devankit.co.in",
+    //   description: "Production Server",
+    // },
   ],
   
 
@@ -238,8 +238,44 @@ const swaggerSpec = {
         responses: {
           200: { description: "OTP sent successfully" },
           400: { description: "A valid email is required" },
+          429: { description: "Please wait before requesting another OTP" },
           500: { description: "Email service is not configured" },
           502: { description: "Unable to send OTP email" },
+        },
+      },
+    },
+
+    "/api/auth/verify-otp": {
+      post: {
+        tags: ["Authentication"],
+        summary: "Verify an emailed OTP",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["email", "otp"],
+                properties: {
+                  email: {
+                    type: "string",
+                    format: "email",
+                    example: "user@example.com",
+                  },
+                  otp: {
+                    type: "string",
+                    pattern: "^\\d{6}$",
+                    example: "123456",
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          200: { description: "OTP verified successfully" },
+          400: { description: "Invalid or expired OTP" },
+          429: { description: "OTP request or verification limit exceeded" },
         },
       },
     },

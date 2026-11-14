@@ -9,8 +9,8 @@ Both roles use the **same two endpoints**:
 
 1. Run `npm install`
 2. Copy `.env.example` to `.env`
-3. Set `MONGO_URI`, a strong `JWT_SECRET`, and Gmail `EMAIL_USER` and `EMAIL_PASS`
-   (use a Google App Password for `EMAIL_PASS`)
+3. Set `MONGO_URI`, a strong `JWT_SECRET`, `RESEND_API_KEY`, and
+   `RESEND_FROM_EMAIL` (an address on a domain verified in Resend)
 4. Run `npm run dev`
 5. Open `http://localhost:5002/api-docs/`
 
@@ -18,10 +18,22 @@ Both roles use the **same two endpoints**:
 
 `POST /api/auth/send-otp` sends a six-digit OTP to the supplied email address.
 The API does not include the OTP in its response.
+Email delivery uses Nodemailer with Resend SMTP on STARTTLS port `2587`.
 
 ```json
 {
   "email": "user@example.com"
+}
+```
+
+`POST /api/auth/verify-otp` verifies the code. OTPs expire after 10 minutes,
+can be requested once per minute per email, and allow at most five attempts.
+This verification endpoint is separate; it does not change the signup flow.
+
+```json
+{
+  "email": "user@example.com",
+  "otp": "123456"
 }
 ```
 

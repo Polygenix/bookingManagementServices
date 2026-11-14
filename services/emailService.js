@@ -1,22 +1,30 @@
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.resend.com",
+  port: 2587,
+  secure: false,
+  requireTLS: true,
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
+    user: "resend",
+    pass: process.env.RESEND_API_KEY
+  },
+  connectionTimeout: 10000,
+  greetingTimeout: 10000,
+  socketTimeout: 20000
 });
 
 const sendEmail = async (to, subject, html) => {
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-    const error = new Error("EMAIL_USER and EMAIL_PASS must be configured");
+  if (!process.env.RESEND_API_KEY || !process.env.RESEND_FROM_EMAIL) {
+    const error = new Error(
+      "RESEND_API_KEY and RESEND_FROM_EMAIL must be configured"
+    );
     error.code = "EMAIL_CONFIG_MISSING";
     throw error;
   }
 
   return transporter.sendMail({
-    from: `"Booking Management" <${process.env.EMAIL_USER}>`,
+    from: `"Booking Management" <${process.env.RESEND_FROM_EMAIL}>`,
     to,
     subject,
     html
