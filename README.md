@@ -9,9 +9,21 @@ Both roles use the **same two endpoints**:
 
 1. Run `npm install`
 2. Copy `.env.example` to `.env`
-3. Set `MONGO_URI` and a strong `JWT_SECRET`
+3. Set `MONGO_URI`, a strong `JWT_SECRET`, and Gmail `EMAIL_USER` and `EMAIL_PASS`
+   (use a Google App Password for `EMAIL_PASS`)
 4. Run `npm run dev`
 5. Open `http://localhost:5002/api-docs/`
+
+## Send an OTP
+
+`POST /api/auth/send-otp` sends a six-digit OTP to the supplied email address.
+The API does not include the OTP in its response.
+
+```json
+{
+  "email": "user@example.com"
+}
+```
 
 ## Persistent uploads on Render
 

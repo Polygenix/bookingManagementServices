@@ -213,6 +213,37 @@ const swaggerSpec = {
       },
     },
 
+    "/api/auth/send-otp": {
+      post: {
+        tags: ["Authentication"],
+        summary: "Send an OTP to an email address",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["email"],
+                properties: {
+                  email: {
+                    type: "string",
+                    format: "email",
+                    example: "user@example.com",
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          200: { description: "OTP sent successfully" },
+          400: { description: "A valid email is required" },
+          500: { description: "Email service is not configured" },
+          502: { description: "Unable to send OTP email" },
+        },
+      },
+    },
+
     // =========================================
     // CUSTOMER BOOKING APIs
     // =========================================

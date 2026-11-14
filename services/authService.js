@@ -2,6 +2,8 @@
 const authRepository = require("../repositories/authRepository");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
+const { sendEmail } = require("./emailService");
 
 const generateToken = (user) => {
   return jwt.sign(
@@ -101,7 +103,41 @@ const login = async (data) => {
   };
 };
 
+const sendOtp = async (data) => {
+  const email = typeof data?.email === "string"
+    ? data.email.trim().toLowerCase()
+    : "";
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    const error = new Error("A valid email is required");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const otp = crypto.randomInt(100000, 1000000).toString();
+
+  try {
+    await sendEmail(
+      email,
+      "Your Booking Management OTP",
+      `<p>Your one-time password is <strong>${otp}</strong>.</p><p>Do not share this code with anyone.</p>`
+    );
+  } catch (cause) {
+    console.error("OTP email delivery failed:", cause.message);
+    const error = new Error(
+      cause.code === "EMAIL_CONFIG_MISSING"
+        ? "Email service is not configured"
+        : "Unable to send OTP email"
+    );
+    error.statusCode = cause.code === "EMAIL_CONFIG_MISSING" ? 500 : 502;
+    throw error;
+  }
+
+  return { email };
+};
+
 module.exports = {
   register,
-  login
+  login,
+  sendOtp
 };

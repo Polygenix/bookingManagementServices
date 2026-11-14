@@ -35,7 +35,25 @@ const login = async (req, res) => {
   }
 };
 
+const sendOtp = async (req, res) => {
+  try {
+    const result = await authService.sendOtp(req.body);
+
+    res.status(200).json({
+      success: true,
+      message: "OTP sent successfully",
+      data: result
+    });
+  } catch (error) {
+    res.status(error.statusCode || 400).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
 module.exports = {
   register,
-  login
+  login,
+  sendOtp
 };
