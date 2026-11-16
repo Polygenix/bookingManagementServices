@@ -15,6 +15,14 @@ const getAllPayments = async () => {
   return await paymentRepository.findAllPayments();
 };
 
+const formatOrderResponse = (payment) => ({
+  paymentId: payment._id,
+  orderId: payment.razorpayOrderId,
+  amount: payment.amount,
+  currency: payment.currency,
+  keyId: process.env.RAZORPAY_KEY_ID
+});
+
 const createOrder = async (bookingId, customerId) => {
   if (!mongoose.Types.ObjectId.isValid(bookingId)) {
     const error = new Error("Invalid booking ID");
@@ -120,13 +128,7 @@ const createOrder = async (bookingId, customerId) => {
       throw error;
     }
 
-    return {
-      paymentId: existingPendingPayment._id,
-      orderId: existingPendingPayment.razorpayOrderId,
-      amount: existingPendingPayment.amount,
-      currency: existingPendingPayment.currency,
-      keyId: process.env.RAZORPAY_KEY_ID
-    };
+    return formatOrderResponse(existingPendingPayment);
   }
 
   const order = await razorpay.orders.create({
@@ -139,22 +141,44 @@ const createOrder = async (bookingId, customerId) => {
     }
   });
 
-  const payment = await paymentRepository.createPayment({
-    booking: booking._id,
-    customer: customerId,
-    razorpayOrderId: order.id,
-    amount: amountInPaise,
-    currency: order.currency,
-    status: "pending"
-  });
+  try {
+    const payment = await paymentRepository.createPayment({
+      booking: booking._id,
+      customer: customerId,
+      razorpayOrderId: order.id,
+      amount: amountInPaise,
+      currency: order.currency,
+      status: "pending"
+    });
 
-  return {
-    paymentId: payment._id,
-    orderId: order.id,
-    amount: order.amount,
-    currency: order.currency,
-    keyId: process.env.RAZORPAY_KEY_ID
-  };
+    return formatOrderResponse(payment);
+  } catch (error) {
+    if (error.code !== 11000 || !error.keyPattern?.booking) {
+      throw error;
+    }
+
+    const pendingPayment = await paymentRepository.findByBookingAndStatus(
+      booking._id,
+      "pending"
+    );
+
+    if (!pendingPayment) {
+      throw error;
+    }
+
+    if (
+      pendingPayment.amount !== amountInPaise ||
+      pendingPayment.currency !== "INR"
+    ) {
+      const conflict = new Error(
+        "An existing pending payment has a different amount; resolve it before creating another order"
+      );
+      conflict.statusCode = 409;
+      throw conflict;
+    }
+
+    return formatOrderResponse(pendingPayment);
+  }
 };
 
 const verifyPayment = async (data, customerId) => {

@@ -44,4 +44,13 @@ const paymentSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+paymentSchema.index(
+  { booking: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { status: "pending" },
+    name: "one_pending_payment_per_booking"
+  }
+);
+
 module.exports = mongoose.model("Payment", paymentSchema);
