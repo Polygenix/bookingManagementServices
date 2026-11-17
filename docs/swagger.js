@@ -71,6 +71,7 @@ const swaggerSpec = {
         type: "object",
         anyOf: [{ required: ["testId"] }, { required: ["testName"] }],
         required: [
+          "patientId",
           "patientName",
           "age",
           "gender",
@@ -81,6 +82,11 @@ const swaggerSpec = {
           "addressId",
         ],
         properties: {
+          patientId: {
+            type: "string",
+            example: "672abc123456789012345679",
+            description: "Saved Patient MongoDB ID",
+          },
           patientName: { type: "string", example: "Rahul Sharma" },
           testName: { type: "string", example: "Blood Test" },
           testId: {

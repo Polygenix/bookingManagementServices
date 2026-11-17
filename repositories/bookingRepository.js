@@ -10,6 +10,7 @@ const createBooking = async (bookingData) => {
 const findAllBookings = async () => {
   return await Booking.find()
     .populate("customer")
+    .populate("patientId")
     .populate("timeSlotId")
     .populate("addressId")
     .sort({ createdAt: -1 });
@@ -17,7 +18,10 @@ const findAllBookings = async () => {
 
 // GET CUSTOMER BOOKINGS
 const findBookingsByCustomer = async (customerId) => {
-  return await Booking.find({ customer: customerId })
+  return await Booking.find({
+    customer: customerId,
+  })
+    .populate("patientId")
     .populate("timeSlotId")
     .populate("addressId")
     .sort({ createdAt: -1 });
@@ -29,6 +33,7 @@ const findBookingById = async (bookingId, customerId) => {
     _id: bookingId,
     customer: customerId,
   })
+    .populate("patientId")
     .populate("timeSlotId")
     .populate("addressId");
 };
@@ -48,6 +53,7 @@ const updateBooking = async (bookingId, customerId, data) => {
       runValidators: true,
     }
   )
+    .populate("patientId")
     .populate("timeSlotId")
     .populate("addressId");
 };
@@ -91,7 +97,9 @@ const deleteBooking = async (bookingId, customerId) => {
         bookedCount: { $gt: 0 },
       },
       {
-        $inc: { bookedCount: -1 },
+        $inc: {
+          bookedCount: -1,
+        },
       }
     );
   }

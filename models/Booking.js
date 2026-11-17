@@ -9,6 +9,15 @@ const bookingSchema = new mongoose.Schema(
       required: true,
     },
 
+    // Link to saved patient profile
+    patientId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Patient",
+      required: true,
+      index: true,
+    },
+
+    // Patient details snapshot at booking time
     patientName: {
       type: String,
       required: true,
@@ -52,10 +61,15 @@ const bookingSchema = new mongoose.Schema(
 
     email: {
       type: String,
-      required: true,
       lowercase: true,
       trim: true,
-      match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Invalid email address"],
+      default: "",
+      validate: {
+        validator: function (value) {
+          return !value || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+        },
+        message: "Invalid email address",
+      },
     },
 
     bookingDate: {
@@ -83,6 +97,7 @@ const bookingSchema = new mongoose.Schema(
     notes: {
       type: String,
       default: "",
+      trim: true,
     },
 
     status: {

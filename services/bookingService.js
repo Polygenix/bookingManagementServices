@@ -5,6 +5,7 @@ const bookingRepository = require("../repositories/bookingRepository");
 const TimeSlot = require("../models/TimeSlot");
 const Address = require("../models/Address");
 const Test = require("../models/Test");
+const Patient = require("../models/Patient");
 
 const throwError = (message, statusCode) => {
   const error = new Error(message);
@@ -15,13 +16,9 @@ const throwError = (message, statusCode) => {
 // CREATE BOOKING
 const createBooking = async (customerId, data) => {
   const {
-    patientName,
+    patientId,
     testName,
     testId,
-    age,
-    gender,
-    phone,
-    email,
     bookingDate,
     timeSlotId,
     addressId,
@@ -29,19 +26,31 @@ const createBooking = async (customerId, data) => {
   } = data;
 
   if (
-    !patientName ||
+    !patientId ||
     (!testId && !testName) ||
-    !age ||
-    !gender ||
-    !phone ||
-    !email ||
     !bookingDate ||
     !timeSlotId ||
     !addressId
   ) {
-    throwError("All required booking fields must be provided", 400);
+    throwError("Patient, test, date, time slot and address are required", 400);
   }
 
+  // VALIDATE PATIENT ID
+  if (!mongoose.Types.ObjectId.isValid(patientId)) {
+    throwError("Invalid patient ID", 400);
+  }
+
+  // VERIFY PATIENT BELONGS TO LOGGED-IN CUSTOMER
+  const patient = await Patient.findOne({
+    _id: patientId,
+    customer: customerId,
+  });
+
+  if (!patient) {
+    throwError("Patient not found or does not belong to customer", 404);
+  }
+
+  // VALIDATE TEST
   if (testId && !mongoose.Types.ObjectId.isValid(testId)) {
     throwError("Invalid test ID", 400);
   }
@@ -51,28 +60,38 @@ const createBooking = async (customerId, data) => {
   }
 
   const test = testId
-    ? await Test.findOne({ _id: testId, isActive: true })
+    ? await Test.findOne({
+        _id: testId,
+        isActive: true,
+      })
     : await Test.findOne({
         testName: testName.trim(),
-        isActive: true
+        isActive: true,
       });
 
   if (!test) {
     throwError("Test not found or inactive", 404);
   }
 
-  if (!Number.isInteger(Number(age)) || age < 1 || age > 120) {
-    throwError("Age must be between 1 and 120", 400);
+  // VALIDATE PATIENT DETAILS
+  if (
+    !patient.patientName ||
+    !Number.isInteger(patient.age) ||
+    patient.age < 1 ||
+    patient.age > 120
+  ) {
+    throwError("Patient profile contains invalid details", 400);
   }
 
-  if (!["Male", "Female", "Other"].includes(gender)) {
-    throwError("Invalid gender", 400);
+  if (!["Male", "Female", "Other"].includes(patient.gender)) {
+    throwError("Invalid patient gender", 400);
   }
 
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    throwError("Invalid email address", 400);
+  if (!/^[6-9]\d{9}$/.test(patient.phone)) {
+    throwError("Invalid patient mobile number", 400);
   }
 
+  // VALIDATE SLOT AND ADDRESS IDS
   if (!mongoose.Types.ObjectId.isValid(timeSlotId)) {
     throwError("Invalid timeSlotId", 400);
   }
@@ -81,6 +100,7 @@ const createBooking = async (customerId, data) => {
     throwError("Invalid addressId", 400);
   }
 
+  // VALIDATE BOOKING DATE
   const selectedDate = new Date(bookingDate);
 
   if (Number.isNaN(selectedDate.getTime())) {
@@ -92,6 +112,7 @@ const createBooking = async (customerId, data) => {
 
   const normalizedBookingDate = new Date(selectedDate);
   normalizedBookingDate.setHours(0, 0, 0, 0);
+
   const slotDate = selectedDate.toISOString().slice(0, 10);
 
   if (normalizedBookingDate < today) {
@@ -133,19 +154,28 @@ const createBooking = async (customerId, data) => {
   }
 
   try {
+    // CREATE BOOKING USING SAVED PATIENT DETAILS
     const booking = await bookingRepository.createBooking({
       customer: customerId,
-      patientName,
+
+      patientId: patient._id,
+
+      // Historical snapshot
+      patientName: patient.patientName,
+      age: patient.age,
+      gender: patient.gender,
+      phone: patient.phone,
+      email: patient.email || "",
+
       testName: test.testName,
       testId: test._id,
       amount: test.price,
-      age: Number(age),
-      gender,
-      phone,
-      email: email.toLowerCase(),
+
       bookingDate: normalizedBookingDate,
+
       timeSlotId: reservedSlot._id,
       timeSlot: `${reservedSlot.startTime}-${reservedSlot.endTime}`,
+
       addressId,
       notes: notes || "",
     });
@@ -162,7 +192,9 @@ const createBooking = async (customerId, data) => {
         bookedCount: { $gt: 0 },
       },
       {
-        $inc: { bookedCount: -1 },
+        $inc: {
+          bookedCount: -1,
+        },
       }
     );
 
@@ -199,14 +231,11 @@ const updateCustomerBooking = async (bookingId, customerId, data) => {
     throwError("Invalid booking ID", 400);
   }
 
+  // Patient details must be updated through Patient API.
+  // Do not overwrite the historical patient snapshot.
   const allowedFields = [
-    "patientName",
     "testName",
     "testId",
-    "age",
-    "gender",
-    "phone",
-    "email",
     "notes",
   ];
 
@@ -218,31 +247,8 @@ const updateCustomerBooking = async (bookingId, customerId, data) => {
     }
   }
 
-  if (updateData.age !== undefined) {
-    if (
-      !Number.isInteger(Number(updateData.age)) ||
-      updateData.age < 1 ||
-      updateData.age > 120
-    ) {
-      throwError("Age must be between 1 and 120", 400);
-    }
-
-    updateData.age = Number(updateData.age);
-  }
-
-  if (
-    updateData.gender !== undefined &&
-    !["Male", "Female", "Other"].includes(updateData.gender)
-  ) {
-    throwError("Invalid gender", 400);
-  }
-
-  if (updateData.email !== undefined) {
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(updateData.email)) {
-      throwError("Invalid email address", 400);
-    }
-
-    updateData.email = updateData.email.toLowerCase();
+  if (Object.keys(updateData).length === 0) {
+    throwError("No valid booking fields provided for update", 400);
   }
 
   if (updateData.testId !== undefined || updateData.testName !== undefined) {
@@ -255,16 +261,16 @@ const updateCustomerBooking = async (bookingId, customerId, data) => {
 
       test = await Test.findOne({
         _id: updateData.testId,
-        isActive: true
+        isActive: true,
       });
     } else {
-      if (typeof updateData.testName !== "string") {
+      if (typeof updateData.testName !== "string" || !updateData.testName.trim()) {
         throwError("Invalid test name", 400);
       }
 
       test = await Test.findOne({
         testName: updateData.testName.trim(),
-        isActive: true
+        isActive: true,
       });
     }
 
@@ -275,6 +281,13 @@ const updateCustomerBooking = async (bookingId, customerId, data) => {
     updateData.testId = test._id;
     updateData.testName = test.testName;
     updateData.amount = test.price;
+  }
+
+  if (
+    updateData.notes !== undefined &&
+    typeof updateData.notes !== "string"
+  ) {
+    throwError("Invalid notes", 400);
   }
 
   const booking = await bookingRepository.updateBooking(
