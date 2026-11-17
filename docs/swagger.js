@@ -2135,6 +2135,242 @@ const swaggerSpec = {
     },
   },
   },
+
+  // =========================================
+  // patient APIs
+  // =========================================
+
+    // =========================================
+    // CUSTOMER PATIENT APIs
+    // =========================================
+
+    "/api/customer/patients": {
+      post: {
+        tags: ["Customer Patient"],
+        summary: "Add Patient",
+        description: "Customer can add a patient profile",
+        security: [{ BearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: [
+                  "patientName",
+                  "age",
+                  "gender",
+                  "phone"
+                ],
+                properties: {
+                  patientName: {
+                    type: "string",
+                    example: "Rahul Kumar"
+                  },
+                  age: {
+                    type: "integer",
+                    example: 25
+                  },
+                  gender: {
+                    type: "string",
+                    enum: ["Male", "Female", "Other"],
+                    example: "Male"
+                  },
+                  phone: {
+                    type: "string",
+                    example: "9876543210"
+                  },
+                  email: {
+                    type: "string",
+                    example: "rahul@gmail.com"
+                  },
+                  relationship: {
+                    type: "string",
+                    enum: [
+                      "Self",
+                      "Father",
+                      "Mother",
+                      "Spouse",
+                      "Child",
+                      "Other"
+                    ],
+                    example: "Self"
+                  }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          201: {
+            description: "Patient added successfully"
+          },
+          400: {
+            description: "Validation error"
+          },
+          401: {
+            description: "Unauthorized"
+          },
+          403: {
+            description: "Customer access required"
+          }
+        }
+      },
+
+      get: {
+        tags: ["Customer Patient"],
+        summary: "Get All Patients",
+        description: "Get all patients belonging to logged-in customer",
+        security: [{ BearerAuth: [] }],
+        responses: {
+          200: {
+            description: "Patients fetched successfully"
+          },
+          401: {
+            description: "Unauthorized"
+          }
+        }
+      }
+    },
+
+    "/api/customer/patients/{id}": {
+      get: {
+        tags: ["Customer Patient"],
+        summary: "Get Patient By ID",
+        security: [{ BearerAuth: [] }],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+              example: "672a12345678901234567890"
+            }
+          }
+        ],
+        responses: {
+          200: {
+            description: "Patient fetched successfully"
+          },
+          400: {
+            description: "Invalid patient ID"
+          },
+          401: {
+            description: "Unauthorized"
+          },
+          404: {
+            description: "Patient not found"
+          }
+        }
+      },
+
+      put: {
+        tags: ["Customer Patient"],
+        summary: "Update Patient",
+        security: [{ BearerAuth: [] }],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+              example: "672a12345678901234567890"
+            }
+          }
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  patientName: {
+                    type: "string",
+                    example: "Rahul Kumar"
+                  },
+                  age: {
+                    type: "integer",
+                    example: 26
+                  },
+                  gender: {
+                    type: "string",
+                    enum: ["Male", "Female", "Other"]
+                  },
+                  phone: {
+                    type: "string",
+                    example: "9876543210"
+                  },
+                  email: {
+                    type: "string",
+                    example: "rahul@gmail.com"
+                  },
+                  relationship: {
+                    type: "string",
+                    enum: [
+                      "Self",
+                      "Father",
+                      "Mother",
+                      "Spouse",
+                      "Child",
+                      "Other"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        responses: {
+          200: {
+            description: "Patient updated successfully"
+          },
+          400: {
+            description: "Invalid patient ID or data"
+          },
+          401: {
+            description: "Unauthorized"
+          },
+          404: {
+            description: "Patient not found"
+          }
+        }
+      },
+
+      delete: {
+        tags: ["Customer Patient"],
+        summary: "Delete Patient",
+        security: [{ BearerAuth: [] }],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: {
+              type: "string",
+              example: "672a12345678901234567890"
+            }
+          }
+        ],
+        responses: {
+          200: {
+            description: "Patient deleted successfully"
+          },
+          400: {
+            description: "Invalid patient ID"
+          },
+          401: {
+            description: "Unauthorized"
+          },
+          404: {
+            description: "Patient not found"
+          }
+        }
+      }
+    },
+
   },
 };
 

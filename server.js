@@ -17,6 +17,7 @@ const timeSlotRoutes = require("./routes/timeSlotRoutes");
 const customerTimeSlotRoutes = require("./routes/customerTimeSlotRoutes");
 const addressRoutes = require("./routes/addressRoutes");
 const reportRoutes = require("./routes/reportRoutes");
+const patientRoutes = require("./routes/patientRoutes");
 const customerReportRoutes = require("./routes/customerReportRoutes");
 const adminCustomerRoutes = require("./routes/adminCustomerRoutes");
 
@@ -44,6 +45,7 @@ app.use("/api/customer/addresses", addressRoutes);
 app.use("/api/customer/reports", customerReportRoutes);
 app.use("/api/admin/reports", reportRoutes);
 app.use("/api/admin", adminCustomerRoutes);
+app.use("/api/customer/patients", patientRoutes);
 
 
 // Auth APIs
