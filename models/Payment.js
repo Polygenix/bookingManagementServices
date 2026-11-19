@@ -18,10 +18,7 @@ const paymentSchema = new mongoose.Schema(
       unique: true
     },
     razorpayPaymentId: {
-      type: String,
-      default: null,
-      unique: true,
-      sparse: true
+      type: String
     },
     amount: {
       type: Number,
@@ -50,6 +47,17 @@ paymentSchema.index(
     unique: true,
     partialFilterExpression: { status: "pending" },
     name: "one_pending_payment_per_booking"
+  }
+);
+
+paymentSchema.index(
+  { razorpayPaymentId: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      razorpayPaymentId: { $type: "string" }
+    },
+    name: "unique_razorpay_payment_id"
   }
 );
 
