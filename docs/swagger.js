@@ -148,6 +148,44 @@ const swaggerSpec = {
           },
         },
       },
+
+      ContactUsRequest: {
+        type: "object",
+        required: ["name", "email", "phone", "subject", "message"],
+        properties: {
+          name: {
+            type: "string",
+            minLength: 1,
+            maxLength: 100,
+            example: "Rahul Sharma",
+          },
+          email: {
+            type: "string",
+            format: "email",
+            maxLength: 254,
+            example: "rahul@example.com",
+          },
+          phone: {
+            type: "string",
+            minLength: 7,
+            maxLength: 20,
+            pattern: "^[+0-9()\\-\\s]{7,20}$",
+            example: "9876543210",
+          },
+          subject: {
+            type: "string",
+            minLength: 1,
+            maxLength: 150,
+            example: "Booking enquiry",
+          },
+          message: {
+            type: "string",
+            minLength: 1,
+            maxLength: 5000,
+            example: "I need help with my booking.",
+          },
+        },
+      },
     },
   },
 
