@@ -23,6 +23,8 @@ const adminCustomerRoutes = require("./routes/adminCustomerRoutes");
 
 
 
+const contactRoutes = require("./routes/contactRoutes");
+
 
 
 
@@ -46,6 +48,9 @@ app.use("/api/customer/reports", customerReportRoutes);
 app.use("/api/admin/reports", reportRoutes);
 app.use("/api/admin", adminCustomerRoutes);
 app.use("/api/customer/patients", patientRoutes);
+
+
+app.use("/api/contact-us", contactRoutes);
 
 
 // Auth APIs

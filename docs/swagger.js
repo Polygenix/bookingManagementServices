@@ -2428,7 +2428,78 @@ const swaggerSpec = {
       }
     },
 
+    //=========================================
+    // Contact Us APIs
+    //=========================================
+    
+"/api/contact-us": {
+  post: {
+    tags: ["Contact Us"],
+    summary: "Submit Contact Us Enquiry",
+    description:
+      "Submit an enquiry. The enquiry is saved in MongoDB and an email is sent to the configured contact email.",
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            $ref: "#/components/schemas/ContactUsRequest"
+          },
+          example: {
+            name: "Rahul Sharma",
+            email: "rahul@example.com",
+            phone: "9876543210",
+            subject: "Booking enquiry",
+            message: "I need help with my booking."
+          }
+        }
+      }
+    },
+    responses: {
+      201: {
+        description: "Enquiry submitted and email sent successfully",
+        content: {
+          "application/json": {
+            example: {
+              success: true,
+              message: "Your enquiry has been submitted successfully",
+              data: {
+                enquiryId: "673abc123456789012345678",
+                emailSent: true
+              }
+            }
+          }
+        }
+      },
+      202: {
+        description: "Enquiry saved but email delivery failed",
+        content: {
+          "application/json": {
+            example: {
+              success: true,
+              message:
+                "Enquiry saved, but email delivery failed. Please try again later.",
+              data: {
+                enquiryId: "673abc123456789012345678",
+                emailSent: false
+              }
+            }
+          }
+        }
+      },
+      400: {
+        description: "Invalid request or missing required fields"
+      },
+      500: {
+        description: "Internal server error"
+      }
+    }
+  }
+},
+
+
   },
+  
 };
 
 
